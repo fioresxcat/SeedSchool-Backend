@@ -4,7 +4,7 @@ const Parent = require('../models/parent')
 const checkParentRole = async (req, res, next) => {
     const token = req.headers.authorization.split(' ')[1] // lấy token từ cookie
     console.log('Token gui len tu cilent: ' + token)
-    if (token=='undefined') return res.json({ status: 'fail', msg: 'token not found'}) 
+    if (token=='undefined') return res.json({ status: 'fail', msg: 'token not found. cannot access parent functionality'}) 
 
     const _id = jwt.verify(token, 'mk') // decrypt lại id người dùng từ cookie
     try {

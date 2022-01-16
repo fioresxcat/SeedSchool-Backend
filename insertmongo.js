@@ -9,7 +9,7 @@ const Tuition = require('./models/tuition')
 const Test = require('./models/test')
 const Schedule = require('./models/schedule')
 
-mongoose.connect('mongodb://localhost/seedschool')
+mongoose.connect('DATABASE_URL=mongodb+srv://fiores:nncnpm@cluster0.u51hn.mongodb.net/seedschool?retryWrites=true&w=majority')
 const connection = mongoose.connection
 connection.on('error', error => console.error(error))
 connection.once('open', () => console.log('Connected to MongoDB!')) // khi kết nối lần đầu, hiện ra thông báo connected to môngdb
@@ -30,7 +30,7 @@ const parent = new Parent({
     phoneNumber: "987654321",
     address: "Hà Nội",
 })
-//  save(parent)
+// save(parent)
 
 const student = new Student({
     name: "ta duc trung",
@@ -111,18 +111,24 @@ async function save(entity) {
     }
 }
 
-
+// LogBook.findById('61e3d50e5b7ebc88af65f850').populate('newSchedule').exec(function(err, doc) {
+//     if(err) {
+//         console.log(err)
+//     } else {
+//         console.log(doc.newSchedule.activityList)
+//     }
+// })
 
 
 updateTuition('61ca8c2b5877b1ca3bbad3d1', new Date(Date.UTC(2022, 0, 31)))
 async function updateTuition(teacher, date) {
     let allStudentTuitions
+
     const month = date.getMonth()
     const year = date.getFullYear()
     const start = new Date(Date.UTC(year, month, 1))
     const end = new Date(Date.UTC(year, month+1, 1))
-    console.log(start)
-    console.log(end)
+
     try {
         allStudentTuitions = await LogBook.aggregate([
             {
@@ -140,10 +146,10 @@ async function updateTuition(teacher, date) {
                     total_lookafter_late_2: {
                         $sum: "$lookAfterLate2"
                     },
-                    total_late_for_school_1: {
+                    total_valid_absence: {
                         $sum: "$lateForSchool1"
                     },
-                    total_late_for_school_2: {
+                    total_invalid_absence: {
                         $sum: "$lateForSchool2"
                     }
                 }
@@ -171,12 +177,12 @@ async function saveTuition(tuition, teacher, date) {
         teacher: teacher,
         student: tuition._id,
         date: date,
-        validAbsence: tuition.total_late_for_school_1,
-        invalidAbsence: tuition.total_late_for_school_2,
+        validAbsence: tuition.total_valid_absence,
+        invalidAbsence: tuition.total_invalid_absence,
         late1: tuition.total_lookafter_late_1,
         late2: tuition.total_lookafter_late_2,
     })
-    console.log(newTuition)
+    
     try {
         newTuition.save()
         console.log('save tuition ok')

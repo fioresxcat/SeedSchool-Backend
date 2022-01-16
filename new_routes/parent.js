@@ -8,7 +8,7 @@ const parentController = require('../controller/parentController')
 
 // khi nguoi dung nhan nut dang nhap
 router.post('/api/parent/login', parentController.login);
-// lay thong tin hoc sinh tuong ung
+// lay thong tin hoc sinh tuong ung de hien thi ra trang xem thong tin hoc sinh
 router.get('/api/parent/getstudent', checkParentRole, parentController.getStudent)
 // lay thong tin so theo doi 10 ngay gan nhat
 router.get('/api/parent/getlogbooks', checkParentRole, parentController.getLogBooks)

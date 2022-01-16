@@ -357,7 +357,6 @@ const getTuitions = async (req, res) => {
 
 // ---------------------------------------- ultility functions ----------------------------------------
 async function updateTuition(teacher, date) {
-    // tim tat ca nhung logbook cua teacher nay trong thang nay
     let allStudentTuitions
 
     const month = date.getMonth()
@@ -382,42 +381,43 @@ async function updateTuition(teacher, date) {
                     total_lookafter_late_2: {
                         $sum: "$lookAfterLate2"
                     },
-                    total_late_for_school_1: {
+                    total_valid_absence: {
                         $sum: "$lateForSchool1"
                     },
-                    total_late_for_school_2: {
+                    total_invalid_absence: {
                         $sum: "$lateForSchool2"
                     }
                 }
             }
 
         ])
-        // console.log(allStudentTuitions)
+        console.log(allStudentTuitions)
 
         // sử dụng thằng ở trên để uppdate vào tuition database
         for (const tuition of allStudentTuitions) {
-            saveTuition(tuition, date)
+            saveTuition(tuition, teacher, date)
         }
+        
 
         return allStudentTuitions
     } catch (err) {
         console.log(err)
     }
 
+
 }
 
-
-async function saveTuition(tuition, date) {
+async function saveTuition(tuition, teacher, date) {
     let newTuition = new Tuition({
         teacher: teacher,
         student: tuition._id,
         date: date,
-        validAbsence: tuition.total_late_for_school_1,
-        invalidAbsence: tuition.total_late_for_school_2,
+        validAbsence: tuition.total_valid_absence,
+        invalidAbsence: tuition.total_invalid_absence,
         late1: tuition.total_lookafter_late_1,
         late2: tuition.total_lookafter_late_2,
     })
-    console.log(newTuition)
+    
     try {
         newTuition.save()
         console.log('save tuition ok')

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Schedule = require("./schedule");
 
 const Schema = mongoose.Schema;
 
@@ -21,11 +22,11 @@ const logBookSchema = new Schema({
         type: String,   
         required: true        
     },
-    schedule: {
-        type: mongoose.SchemaTypes.ObjectId,
-        required: true,
-        ref:'schedule'
-    },
+    // schedule: {
+    //     type: mongoose.SchemaTypes.ObjectId,
+    //     required: true,
+    //     ref:'schedule'
+    // },
     comment: {
         type: String, 
     },
@@ -51,6 +52,13 @@ const logBookSchema = new Schema({
     }
 }, {
     collection: "logBooks"
+})
+
+logBookSchema.virtual('schedule', {
+    ref: 'schedule',
+    localField: ['teacher', 'date'],
+    foreignField: ['teacher', 'date'],
+    justOne: true
 })
 
 module.exports = mongoose.model("logBook",logBookSchema);

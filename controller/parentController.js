@@ -5,9 +5,9 @@ const Tuition = require('../models/tuition')
 const jwt = require('jsonwebtoken')
 
 const login = async (req, res) => {
-    if (req.headers.authorization.split(' ')[1] === 'undefined') {
-        console.log('Khong co authoorixation ne')
-        console.log(req.headers)
+    if (req.headers.authorization.split(' ')[1] === 'undefined') { // neu khong co token gui len
+        console.log('Đăng nhập không có authorization')
+        // console.log(req.headers)
         const username = req.body.username
         const password = req.body.password
         // console.log(username, password)
@@ -15,7 +15,7 @@ const login = async (req, res) => {
             const parent = await Parent.findOne({ username: username, password: password }) // tìm trong csdl xem có tk hợp lệ không
             if (parent) {
                 const token = jwt.sign({ _id: parent._id }, 'mk') // mã hóa id của người dùng dưới dạng 1 chuỗi jwt
-                return res.json({ status: 'success', token: token, parent: parent })
+                return res.json({ status: 'ok', token: token, parent: parent })
             } else {
                 console.log('parent not found')
                 return res.json({ status: 'fail', msg: 'parent not found' })
@@ -24,7 +24,7 @@ const login = async (req, res) => {
             console.log('server error')
             console.log(err)
         }
-    } else {
+    } else { // nếu có token gửi kèm lên, tức là người dùng đã đăng nhập trong phiên đó rồi
         const token = req.headers.authorization.split(' ')[1];
         if (token) {
             jwt.verify(token, 'mk', (err, result) => {
@@ -33,7 +33,7 @@ const login = async (req, res) => {
                     Parent.findById(result._id, (err, result) => {
                         if (err) return res.json({ status: 'fail', msg: 'server error' })
                         else if (result) {
-                            return res.json({ status: 'success', parent: result, msg: 'login successfully', token: token })
+                            return res.json({ status: 'ok', parent: result, msg: 'login ok', token: token })
                         }
                     })
                 }
@@ -48,15 +48,15 @@ const getStudent = async (req, res, next) => {
     try {
         const student = await Student.findOne({ parent: parent._id })
         if (student) {
-            return res.json({ status: 'ok', msg: 'find successfully', student: student, parent: req.parent })
+            return res.json({ status: 'ok', msg: 'get student with this parent ok', student: student, parent: parent })
         } else {
             console.log('student of parent not found')
-            return res.json({ status: 'fail', msg: 'not found student' })
+            return res.json({ status: 'fail', msg: 'student of parent not found' })
         }
     } catch (err) {
         console.log('server err')
         console.log(err)
-        return res.json({ status: 'fail', msg: 'server err' })
+        return res.json({ status: 'fail', msg: err.message})
     }
 }
 
