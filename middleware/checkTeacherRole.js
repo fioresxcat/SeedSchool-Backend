@@ -2,22 +2,23 @@ const jwt = require('jsonwebtoken')
 const Teacher = require('../models/teacher')
 
 const checkTeacherRole = async (req, res, next) => {
-    const token = req.cookies.userToken // lấy token từ cookie
-    if (!token) return res.redirect('./teacher/login') // nếu ko có token, trả lại trang login
+    const token = req.headers.authorization.split(' ')[1] // lấy token từ cookie
+    console.log('Token gui len tu cilent: ' + token)
+    if (token=='undefined') return res.json({ status: 'fail', msg: 'token not found'}) 
 
     const _id = jwt.verify(token, 'mk') // decrypt lại id người dùng từ cookie
     try {
-        const teacher = await Teacher.findById(_id) // lấy admin từ id tương ứng
+        const teacher = await Teacher.findById(_id) // lấy teacher từ id tương ứng
         if (teacher) {
-            req.admin = teacher
+            req.teacher = teacher
             next()
         } else {
             console.log('you need to login as teacher')
-            return res.redirect('/teacher/login')
+            return res.json({ status: 'fail', msg: 'invalid teacher token'})
         }
-    } catch (err) {
+    } catch(err) {
         console.log(err)
-        return res.redirect('/teacher/login')
+        return res.json({ status: 'fail', msg: 'server error'})
     }
 }
 

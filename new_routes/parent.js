@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-const jwt = require('jsonwebtoken')
 const checkParentRole = require('../middleware/checkParentRole')
 const parentController = require('../controller/parentController')
 
@@ -11,7 +10,10 @@ const parentController = require('../controller/parentController')
 router.post('/api/parent/login', parentController.login);
 // lay thong tin hoc sinh tuong ung
 router.get('/api/parent/getstudent', checkParentRole, parentController.getStudent)
-// lay thong tin so theo doi
-router.get('/api/parent/getlogbook', checkParentRole, parentController.getLogBook)
+// lay thong tin so theo doi 10 ngay gan nhat
+router.get('/api/parent/getlogbooks', checkParentRole, parentController.getLogBooks)
+// lay thong tin hoc phi
+router.get('/api/parent/gettuition', checkParentRole, parentController.getTuition)
+
 
 module.exports = router

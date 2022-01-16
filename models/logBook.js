@@ -11,7 +11,7 @@ const logBookSchema = new Schema({
     teacher: {
         type: mongoose.SchemaTypes.ObjectId,
         required: true,
-        ref: "teacher"
+        ref: "teacherattenda"
     },
     date: {
         type: Date,
@@ -22,18 +22,29 @@ const logBookSchema = new Schema({
         required: true        
     },
     schedule: {
-        type: [String],
-        required: true
+        type: mongoose.SchemaTypes.ObjectId,
+        required: true,
+        ref:'schedule'
     },
     comment: {
         type: String, 
     },
-    lookAfterLate: { 
+    lookAfterLate1: { 
         type: Number,
-        enum: [0,1,2], // 0 - dung gio, 1 - tu 5r den 6r, 2 - sau 6r
+        enum: [0,1], // 0 - dung gio, 1 - tu 5r den 6r, 2 - sau 6r
         required: true
     },
-    lateForSchool: {
+    lookAfterLate2: { 
+        type: Number,
+        enum: [0,1], // 0 - dung gio, 1 - tu 5r den 6r, 2 - sau 6r
+        required: true
+    },
+    lateForSchool1: {
+        type: Number,
+        enum: [0,1],   
+        required: true
+    },
+    lateForSchool2: {
         type: Number,
         enum: [0,1],   
         required: true

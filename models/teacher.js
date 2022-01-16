@@ -33,11 +33,16 @@ const teacherSchema = new Schema({
         type: String,
         required: true
     },
+    // class: {
+    //     type: mongoose.SchemaTypes.ObjectId,
+    //     required: true,
+    //     ref: "class"
+    // },
     class: {
-        type: mongoose.SchemaTypes.ObjectId,
+        type: String,
         required: true,
-        ref: "class"
-    },
+        unique: true
+    }
 }, {
     collection: "teachers"
 })

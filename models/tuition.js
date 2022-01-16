@@ -3,17 +3,22 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const tuitionSchema = new Schema({
+    teacher: {
+        type: mongoose.SchemaTypes.ObjectId,
+        required:true,
+        ref:'teacher'
+    },
     student: {
         type: mongoose.SchemaTypes.ObjectId,
         required: true,
         ref: "student"
     },
-    month: {
-        type: Number,
+    date: { // cái này là tháng này
+        type: Date,
         required: true
     },
     baseTuition: {
-        type: Schema.Types.Decimal128,
+        type: mongoose.SchemaTypes.Decimal128,
         required: true,
         default: 5
     },
@@ -33,7 +38,7 @@ const tuitionSchema = new Schema({
         type: Number,
         required: true
     }
-}, {
+}, {                               
     collection: "tuitions"
 })
 

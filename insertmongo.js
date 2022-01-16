@@ -1,10 +1,13 @@
 const mongoose = require('mongoose')
-// const User = require('./models/user')
+const moment = require('moment')
 const Parent = require('./models/parent')
 const Student = require('./models/student')
-const Class = require('./models/class')
 const Teacher = require('./models/teacher')
-
+const LogBook = require('./models/logBook')
+const ActivitySchedule = require('./models/activitySchedule')
+const Tuition = require('./models/tuition')
+const Test = require('./models/test')
+const Schedule = require('./models/schedule')
 
 mongoose.connect('mongodb://localhost/seedschool')
 const connection = mongoose.connection
@@ -18,44 +21,80 @@ connection.once('open', () => console.log('Connected to MongoDB!')) // khi kết
 // })
 
 const parent = new Parent({
-    username: 'trongnd',
-    password: '20194389',
+    username: 'phunl',
+    password: '20194111',
     role: 'parent',
-    name: "nguyễn đức trọng",
-    birth: new Date(2001, 5, 22),
+    name: "nguyen long phu",
+    birth: new Date(Date.UTC(2001, 3, 5)),
     sex: "Nam",
-    phoneNumber: "0988168182",
+    phoneNumber: "987654321",
     address: "Hà Nội",
 })
+//  save(parent)
 
 const student = new Student({
-    name: "trần xuân tùng",
-    birth: new Date(2001, 7, 20),
+    name: "ta duc trung",
+    birth: new Date(Date.UTC(2005, 6, 10)),
     sex: "Nam",
-    teacher: "61ca8bdb29660c8b3849f1b4",
-    parent: "61ca8c7b7bb9b6cd6969ad09",
+    teacher: "61ca8c2b5877b1ca3bbad3d1",
+    parent: "61e3c7a090ec436b507e3810",
 })
+// save(student)
 
-const classs = new Class({
-    name: "1A",
-})
 
 const teacher = new Teacher({
-    username: 'anhdt',
-    password: '20194219',
+    username: 'longnd',
+    password: '20194100',
     role: 'teacher',
-    name: "dinh tuan anh",
-    birth: new Date(2001, 8, 25),
+    name: "Nguyen Duc Long",
+    birth: new Date(Date.UTC(2001, 8, 5)),
     sex: "Nam",
     phoneNumber: "0852252482",
-    class: '61ca8bdb29660c8b3849f1b4'
+    class: '1B'
 })
+// save(teacher)
 
-save(student)
+const activitySchedule = new ActivitySchedule({
+    teacher: '61ca8c2b5877b1ca3bbad3d1',
+    date: new Date(Date.UTC(2022, 0, 10)),
+    startTime: new Date(Date.UTC(2022, 0, 14, 20, 0, 0)),
+    endTime: new Date(Date.UTC(2022, 0, 14, 21, 0, 0)),
+    name: 'di ngu trung',
+    content: 'di ngu nao trung'
+})
+// save(activitySchedule)
 
+const schedule = new Schedule({
+    teacher: '61e38b1be874b5dbe5aae671',
+    date: new Date(Date.UTC(2022, 0, 13)),
+    activityList: [
+        {
+            start: new Date(Date.UTC(2022, 0,13,14,00,00)),
+            end: new Date(Date.UTC(2022, 0,13,15,00,00)),
+            content:'tap the duc thay long'
+        },
+        {
+            start: new Date(Date.UTC(2022, 0,13,16,00,00)),
+            end: new Date(Date.UTC(2022, 0,13,17,00,00)),
+            content:'tap the duc tiep thay long'
+        }
+    ]
+})
+// save(schedule)
 
-//findParent(student)
-
+const logBook = new LogBook({
+    student: '61e3c7ca3c4eb8d6d7dd41d0', //ttrung
+    teacher: '61ca8c2b5877b1ca3bbad3d1', //anhdt
+    date: new Date(Date.UTC(2022, 0, 18)),
+    attendancePicture: 'anh diem danh',
+    schedule: '61e3d032c60a154258d19b00',
+    comment: 'chau trung ngoan lam',
+    lookAfterLate1: 0,
+    lookAfterLate2: 1,
+    lateForSchool1: 1,
+    lateForSchool2: 0
+})
+// save(logBook)
 
 async function findParent(student) {
     const parent = await Parent.findById(student.parent)
@@ -65,7 +104,83 @@ async function findParent(student) {
 async function save(entity) {
     try {
         await entity.save()
+        console.log("save ok")
+
     } catch (err) {
         console.log(err)
+    }
+}
+
+
+
+
+updateTuition('61ca8c2b5877b1ca3bbad3d1', new Date(Date.UTC(2022, 0, 31)))
+async function updateTuition(teacher, date) {
+    let allStudentTuitions
+    const month = date.getMonth()
+    const year = date.getFullYear()
+    const start = new Date(Date.UTC(year, month, 1))
+    const end = new Date(Date.UTC(year, month+1, 1))
+    console.log(start)
+    console.log(end)
+    try {
+        allStudentTuitions = await LogBook.aggregate([
+            {
+                $match: {
+                    "teacher": mongoose.Types.ObjectId(teacher),
+                    "date": {$gte: start, $lt: end} 
+                }
+            },
+            {
+                $group: {
+                    _id: '$student',
+                    total_lookafter_late_1: {
+                        $sum: "$lookAfterLate1"
+                    },
+                    total_lookafter_late_2: {
+                        $sum: "$lookAfterLate2"
+                    },
+                    total_late_for_school_1: {
+                        $sum: "$lateForSchool1"
+                    },
+                    total_late_for_school_2: {
+                        $sum: "$lateForSchool2"
+                    }
+                }
+            }
+
+        ])
+        console.log(allStudentTuitions)
+
+        // sử dụng thằng ở trên để uppdate vào tuition database
+        for (const tuition of allStudentTuitions) {
+            saveTuition(tuition, teacher, date)
+        }
+        
+
+        return allStudentTuitions
+    } catch (err) {
+        console.log(err)
+    }
+
+
+}
+
+async function saveTuition(tuition, teacher, date) {
+    let newTuition = new Tuition({
+        teacher: teacher,
+        student: tuition._id,
+        date: date,
+        validAbsence: tuition.total_late_for_school_1,
+        invalidAbsence: tuition.total_late_for_school_2,
+        late1: tuition.total_lookafter_late_1,
+        late2: tuition.total_lookafter_late_2,
+    })
+    console.log(newTuition)
+    try {
+        newTuition.save()
+        console.log('save tuition ok')
+    } catch (err) {
+        console.log('cannot save new tuition')
     }
 }

@@ -19,12 +19,6 @@ router.get('/login', (req, res) => {
 })
 
 
-// 2. hien thi thong tin chao mung giao vien
-router.get('/dashboard', checkTeacherRole, async (req, res) => {
-    res.send(`Chao mung giao vien ${req.teacher.name} den voi he thong quan tri cuar truong mam non seed school`)
-})
-
-
 // 3. xem bang quan ly thong tin hoc sinh
 /*
 giao dien:

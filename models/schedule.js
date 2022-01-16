@@ -3,22 +3,21 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const scheduleSchema = new Schema({
-    class: {
+    teacher: {
         type: mongoose.SchemaTypes.ObjectId,
-        required: true,
-        ref: "lop"
+        reuiqred: true
     },
     date: {
         type: Date,
         required: true
     },
-    Cachd: { 
-        type: [String], 
-        required: true
+    activityList: {
+        type: [{
+            start: Date,
+            end: Date,
+            content: String
+        }]
     }
-}, {
-    collection: "schedule"
 })
 
-module.exports = mongoose.model("schedule",scheduleSchema);
-
+module.exports = mongoose.model("schedule", scheduleSchema);

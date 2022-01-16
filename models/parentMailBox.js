@@ -6,7 +6,7 @@ const parentMailBoxSchema = new Schema({
     parent: {
         type: mongoose.SchemaTypes.ObjectId,
         required: true,
-        ref: "phuhuynh"
+        ref: "parent"
     },
     date: {
         type: Date,

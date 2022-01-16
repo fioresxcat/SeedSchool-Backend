@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");   
-const Class = require('./class')
 
 const Schema = mongoose.Schema;
 
@@ -32,9 +31,8 @@ const studentSchema = new Schema({
 })
 
 // virtual method: className
-studentSchema.virtual('className').get(async function() {
-    const classs = await Class.findById(this.teacher.class)
-    return classs.name
+studentSchema.virtual('className').get(function() {
+    return this.teacher.class
 })
 
 // virtual method: parentPhoneNumber
