@@ -50,7 +50,7 @@ app.use(indexRouter)
 app.use(parentRouter, function(req,res,next){
     next()
 })
-// app.set('view engine', 'ejs')
+app.set('view engine', 'ejs')
 app.set('views', __dirname + '/views')
 
 app.listen(3000)
