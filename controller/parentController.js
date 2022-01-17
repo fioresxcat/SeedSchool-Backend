@@ -51,7 +51,7 @@ const login = async (req, res) => {
 const getDetailStudent = async (req, res, next) => {
     const parent = req.parent
     try {
-        const student = await Student.findOne({ parent: parent._id })
+        const student = await Student.findOne({ parent: parent._id }).populate('teacher')
         if (student) {
             return res.json({ status: 'ok', msg: 'get student with this parent ok', student: student, parent: parent })
         } else {
@@ -146,7 +146,7 @@ const getSchedule = async (req, res) => {
 
 const getTuition = async (req, res) => {
     const time = req.query.time // yyyy-mm
-    if (!month) { // neu ko co thang gui len, tra lai hoc phi 10 thang gan nhat
+    if (!time) { // neu ko co thang gui len, tra lai hoc phi 10 thang gan nhat
         try {
             const student = await Student.findOne({ parent: req.parent._id })
             if (student) {
@@ -262,4 +262,5 @@ module.exports.getLogBook = getLogBook
 module.exports.getTuition = getTuition
 module.exports.getAllMail = getAllMail
 module.exports.getDetailMail = getDetailMail
+module.exports.getSchedule = getSchedule
 module.exports.postMail = postMail
