@@ -8,7 +8,7 @@ const checkParentRole = async (req, res, next) => {
 
     const _id = jwt.verify(token, 'mk') // decrypt lại id người dùng từ cookie
     try {
-        const parent = await Parent.findById(_id) // lấy parent từ id tương ứng
+        const parent = await Parent.findById(_id).populate('student') // lấy parent từ id tương ứng
         if (parent) {
             req.parent = parent
             next()

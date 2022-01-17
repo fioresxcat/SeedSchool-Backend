@@ -10,7 +10,7 @@ const parentController = require('../controller/parentController')
 router.post('/api/parent/login', parentController.login);
 // lay thong tin hoc sinh tuong ung de hien thi ra trang xem thong tin hoc sinh
 router.get('/api/parent/getstudent', checkParentRole, parentController.getStudent)
-// lay thong tin so theo doi 10 ngay gan nhat
+// lay thong tin so theo doi 
 router.get('/api/parent/getlogbooks', checkParentRole, parentController.getLogBooks)
 // lay thong tin hoc phi
 router.get('/api/parent/gettuition', checkParentRole, parentController.getTuition)

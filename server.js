@@ -12,6 +12,7 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 
 const parentRouter = require('./new_routes/parent')
+const teacherRouter = require('./new_routes/teacher')
 const indexRouter = require('./routes/index')
 
 const app = express()
@@ -45,12 +46,17 @@ app.use(cors(corsOpts))
 app.use(methodOverride('_method'))
 app.use(cookieParser())
 
-
+// routes
 app.use(indexRouter)
 app.use(parentRouter, function(req,res,next){
     next()
 })
-app.set('view engine', 'ejs')
+app.use(teacherRouter, function(req,res,next){
+    next()
+})
+app.use('/', require('./sever/routes/router'))
+
+// app.set('view engine', 'ejs')
 app.set('views', __dirname + '/views')
 
 app.listen(3000)

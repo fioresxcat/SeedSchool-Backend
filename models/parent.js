@@ -26,7 +26,7 @@ const parentSchema = new Schema({
     },
     sex: {
         type: String,
-        enum: ["Nam","Nữ"],
+        enum: ["Nam", "Nữ"],
         required: true
     },
     phoneNumber: {
@@ -37,16 +37,18 @@ const parentSchema = new Schema({
         type: String,
         required: true
     },
-    // student: {
-    //     type: [mongoose.SchemaTypes.ObjectId],
-    //     required: true,
-    //     ref: "student"
-    // } // bỏ phần này đi để có thể thêm được phụ huynh
 }, {
     collection: "parents"
 })
 
-module.exports = mongoose.model("parent",parentSchema);
+parentSchema.virtual('student', {
+    ref: 'student',
+    localField: '_id',
+    foreignField: 'parent',
+    justOne: true
+})
+
+module.exports = mongoose.model("parent", parentSchema);
 
 // tài khoản phụ huynh do trường cấp
 // các thao tác

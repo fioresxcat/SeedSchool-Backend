@@ -1,23 +1,32 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema;
+const UserSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  date: {
+    type: Date,
+    timestamp: true
+  },
+  place:{
+    type: String,
+    required: true
+  },
+  timeStart:{
+    type: String,
+    required: true
+  },
+  timeFinish:{
+    type: String,
+    required: true
+  }
+});
 
-const activitiSchema = new Schema({
-    time: { 
-        type: Date, 
-        required: true
-    },
-    content: {
-        type: String,
-        required: true
-    },
-    note: {
-        type: String,
-        required: true
-    }
-}, {
-    collection: "activities"
-})
+const Activity = mongoose.model('Activity', UserSchema);
 
-module.exports = mongoose.model("activity",activitiSchema);
-
+module.exports = Activity;

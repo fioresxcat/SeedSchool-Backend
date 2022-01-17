@@ -1,8 +1,9 @@
 const Teacher = require('../models/teacher')
 const Student = require('../models/student')
+const Parent = require('../models/student')
 const LogBook = require('../models/logBook')
 const Tuition = require('../models/tuition')
-const ActivitySchedule = require('../models/activitySchedule')
+// const ActivitySchedule = require('../models/activitySchedule')
 const jwt = require('jsonwebtoken')
 
 
@@ -42,6 +43,8 @@ const login = async (req, res) => {
     }
 }
 
+
+
 // get all students
 const getStudents = async (req, res) => {
     try {
@@ -56,6 +59,8 @@ const getStudents = async (req, res) => {
         return res.json({ status: 'fail', msg: 'server error' })
     }
 }
+
+
 
 // get student with id param
 const getStudent = async (req, res) => {
@@ -72,17 +77,68 @@ const getStudent = async (req, res) => {
     }
 }
 
+const addStudent = async (req, res) => {
+    const { sInfo, pInfo } = req.body
+    const { sName, sBirth, sSex } = sInfo
+    const { pUserName, pPassword, pName, pBirth, pSex, pPhoneNumber, pAddress } = pInfo
+
+    let newParent = new Parent({
+        userName: pUserName,
+        password: pPassword,
+        role: 'parent',
+        name: pName,
+        birth: new Date(pBirth),
+        sex: pSex,
+        phoneNumber: pPhoneNumber,
+        address: pAddress
+    })
+
+    try {
+        const parent = await newParent.save()
+        let newStudent = new Student({
+            name: sName,
+            birth: new Date(sBirth),
+            sex: sSex,
+            teacher: req.teacher,
+            parent: parent
+        })
+        newStudent.save((err, rs) => {
+            if (err) {
+                return res.json({ status: 'fail', msg: 'cannot save new student' })
+            } else {
+                return res.json({ status: 'ok', msg: 'save new student ok', student: newStudent })
+            }
+        })
+    } catch (err) {
+        return res.json({ status: 'fail', msg: 'cannot save new parent' })
+    }
+}
+
+
+
 // edit student with id param
 const editStudent = async (req, res) => {
     let student
     try {
-        student = await Student.findById(req.params.id)
+        student = await Student.findById(req.params.id).populate('parent')
         if (student) {
-            const { name, birth, sex } = req.body
+            const { sInfo, pInfo } = req.body
+            const { sName, sBirth, sSex } = sInfo
+            const { pUserName, pPassword, pName, pBirth, pSex, pPhoneNumber, pAddress } = pInfo
 
-            student.name = name
-            student.birth = new Date(birth)
-            student.sex = sex
+            // update student
+            student.name = sName
+            student.birth = new Date(sBirth)
+            student.sex = sSex
+
+            // update parent
+            student.parent.username = pUserName
+            student.parent.password = pPassword
+            student.parent.name = pName
+            student.parent.birth = new Date(pBirth)
+            student.parent.sex = pSex
+            student.parent.phoneNumber = pPhoneNumber
+            student.parent.address = pAddress
 
             await student.save()
             return res.json({ status: 'ok', msg: 'edit student ok', student: student })
@@ -339,14 +395,14 @@ const getTuitions = async (req, res) => {
                 teacher: req.teacher,
                 date: { $gte: start, $lt: end }
             })
-            if(tuitions) {
-                return res.json({status:'ok', msg:'get tuitions with date ok', tuitions:tuitions})
+            if (tuitions) {
+                return res.json({ status: 'ok', msg: 'get tuitions with date ok', tuitions: tuitions })
             } else {
-                return res.json({status:'fail', msg:'no tuitions in database'})
+                return res.json({ status: 'fail', msg: 'no tuitions in database' })
             }
-        } catch(err) {
+        } catch (err) {
             console.log('server error getting tuition: ' + err)
-            return res.json({status:'fail', msg:err.message})
+            return res.json({ status: 'fail', msg: err.message })
         }
     }
 
@@ -362,14 +418,14 @@ async function updateTuition(teacher, date) {
     const month = date.getMonth()
     const year = date.getFullYear()
     const start = new Date(Date.UTC(year, month, 1))
-    const end = new Date(Date.UTC(year, month+1, 1))
+    const end = new Date(Date.UTC(year, month + 1, 1))
 
     try {
         allStudentTuitions = await LogBook.aggregate([
             {
                 $match: {
                     "teacher": mongoose.Types.ObjectId(teacher),
-                    "date": {$gte: start, $lt: end} 
+                    "date": { $gte: start, $lt: end }
                 }
             },
             {
@@ -397,7 +453,7 @@ async function updateTuition(teacher, date) {
         for (const tuition of allStudentTuitions) {
             saveTuition(tuition, teacher, date)
         }
-        
+
 
         return allStudentTuitions
     } catch (err) {
@@ -417,7 +473,7 @@ async function saveTuition(tuition, teacher, date) {
         late1: tuition.total_lookafter_late_1,
         late2: tuition.total_lookafter_late_2,
     })
-    
+
     try {
         newTuition.save()
         console.log('save tuition ok')
@@ -425,3 +481,18 @@ async function saveTuition(tuition, teacher, date) {
         console.log('cannot save new tuition')
     }
 }
+
+module.exports.login = login
+module.exports.getStudents = getStudents
+module.exports.getStudent = getStudent
+module.exports.addStudent = addStudent
+module.exports.editStudent = editStudent
+module.exports.deleteStudent = deleteStudent
+module.exports.getLogBooks = getLogBooks
+module.exports.addLogBook = addLogBook
+module.exports.editLogBook = editLogBook
+module.exports.getSchedule = getSchedule
+module.exports.addActivitySchedule = addActivitySchedule
+module.exports.editActivitySchedule = editActivitySchedule
+module.exports.deleteActivitySchedule = deleteActivitySchedule
+module.exports.getTuitions = getTuitions

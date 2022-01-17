@@ -2,15 +2,17 @@ const Parent = require('../models/parent')
 const Student = require('../models/student')
 const LogBook = require('../models/logBook')
 const Tuition = require('../models/tuition')
+const Teacher = require('../models/teacher')
 const jwt = require('jsonwebtoken')
+const schedule = require('../models/schedule')
 
 const login = async (req, res) => {
     if (req.headers.authorization.split(' ')[1] === 'undefined') { // neu khong co token gui len
         console.log('Đăng nhập không có authorization')
-        // console.log(req.headers)
+        console.log(req.headers)
         const username = req.body.username
         const password = req.body.password
-        // console.log(username, password)
+        console.log(username, password)
         try {
             const parent = await Parent.findOne({ username: username, password: password }) // tìm trong csdl xem có tk hợp lệ không
             if (parent) {
@@ -56,29 +58,52 @@ const getStudent = async (req, res, next) => {
     } catch (err) {
         console.log('server err')
         console.log(err)
-        return res.json({ status: 'fail', msg: err.message})
+        return res.json({ status: 'fail', msg: err.message })
     }
 }
 
 
 const getLogBooks = async (req, res) => {
-    try {
-        const student = await Student.findOne({ parent: req.parent._id })
-        if (student) {
-            const logBooks = await LogBook.find({ student: student._id }).sort({ date: 1 }).limit(10)
-            if (logBooks) {
-                return res.json({ status: 'ok', msg: 'get logbook ok', logBooks: logBooks })
+    if(!req.body.date) {
+        try {
+            const student = await Student.findOne({ parent: req.parent._id })
+            if (student) {
+                const logBooks = await LogBook.find({ student: student._id }).populate('schedule').populate('student').sort({ date: 1 }).limit(10)
+                if (logBooks) {
+                    let schedules = []
+                    for (const logBook of logBooks) {
+                        console.log(logBook.schedule)
+                        schedules.push(logBook.schedule)
+                    }
+                    return res.json({ status: 'ok', msg: 'get logbook ok', logBooks: logBooks, schedules: schedules })
+                } else {
+                    return res.json({ status: 'fail', msg: 'cannot find logbook with this student' })
+                }
             } else {
-                return res.json({ status: 'fail', msg: 'cannot find logbook with this student' })
+                return res.json({ status: 'fail', msg: 'cannot find student with this parent' })
             }
-        } else {
-            return res.json({ status: 'fail', msg: 'cannot find student with this parent' })
+        } catch (err) {
+            console.log('Server error: ' + err)
+            return res.json({ status: 'fail', msg: 'server err' })
         }
-    } catch (err) {
-        console.log('Server error: ' + err)
-        return res.json({ status: 'fail', msg: 'server err' })
+    } else {
+        const date = new Date(req.body.date)
+        const student = parent.student
+        try {
+            const logBook = await LogBook.findOne({student: student.id, date: date})
+            if(logBook) {
+                return res.json({ status: 'ok', msg: 'get logbook ok', logBook: logBook })
+            } else {
+                return res.json({ status: 'fail', msg: 'cannot find logbook with this student and date' })
+            }
+        } catch(err) {
+            console.log(err)
+            return res.json({ status: 'fail', msg: er.message })
+
+        }
     }
 }
+
 
 
 const getTuition = async (req, res) => {

@@ -8,8 +8,9 @@ const ActivitySchedule = require('./models/activitySchedule')
 const Tuition = require('./models/tuition')
 const Test = require('./models/test')
 const Schedule = require('./models/schedule')
+const Admin = require('./models/admin')
 
-mongoose.connect('DATABASE_URL=mongodb+srv://fiores:nncnpm@cluster0.u51hn.mongodb.net/seedschool?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://fiores:nncnpm@cluster0.u51hn.mongodb.net/seedschool?retryWrites=true&w=majority')
 const connection = mongoose.connection
 connection.on('error', error => console.error(error))
 connection.once('open', () => console.log('Connected to MongoDB!')) // khi kết nối lần đầu, hiện ra thông báo connected to môngdb
@@ -96,6 +97,10 @@ const logBook = new LogBook({
 })
 // save(logBook)
 
+const admin = new Admin({
+
+})
+
 async function findParent(student) {
     const parent = await Parent.findById(student.parent)
     console.log(parent.name)
@@ -111,82 +116,91 @@ async function save(entity) {
     }
 }
 
-// LogBook.findById('61e3d50e5b7ebc88af65f850').populate('newSchedule').exec(function(err, doc) {
+// LogBook.findById('61e3fa60d5769c9cdcb07b19').populate('schedule').exec(function(err, doc) {
 //     if(err) {
 //         console.log(err)
 //     } else {
-//         console.log(doc.newSchedule.activityList)
+//         console.log(doc.schedule)
 //     }
 // })
 
+// Student.findById('61e3f980d5769c9cdcb07b12').populate('parent').exec((err, doc) => {
+//     if(err) {
+//         console.log(err)
+//     } else {
+//         console.log(doc.parent)
+//         doc.parent.name = 'phu dep zai'
+//         save(doc.parent)
+//     }
+// })
 
-updateTuition('61ca8c2b5877b1ca3bbad3d1', new Date(Date.UTC(2022, 0, 31)))
-async function updateTuition(teacher, date) {
-    let allStudentTuitions
+// updateTuition('61e3f935d5769c9cdcb07b0e', new Date(Date.UTC(2022, 0, 31)))
+// async function updateTuition(teacher, date) {
+//     let allStudentTuitions
 
-    const month = date.getMonth()
-    const year = date.getFullYear()
-    const start = new Date(Date.UTC(year, month, 1))
-    const end = new Date(Date.UTC(year, month+1, 1))
+//     const month = date.getMonth()
+//     const year = date.getFullYear()
+//     const start = new Date(Date.UTC(year, month, 1))
+//     const end = new Date(Date.UTC(year, month+1, 1))
 
-    try {
-        allStudentTuitions = await LogBook.aggregate([
-            {
-                $match: {
-                    "teacher": mongoose.Types.ObjectId(teacher),
-                    "date": {$gte: start, $lt: end} 
-                }
-            },
-            {
-                $group: {
-                    _id: '$student',
-                    total_lookafter_late_1: {
-                        $sum: "$lookAfterLate1"
-                    },
-                    total_lookafter_late_2: {
-                        $sum: "$lookAfterLate2"
-                    },
-                    total_valid_absence: {
-                        $sum: "$lateForSchool1"
-                    },
-                    total_invalid_absence: {
-                        $sum: "$lateForSchool2"
-                    }
-                }
-            }
+//     try {
+//         allStudentTuitions = await LogBook.aggregate([
+//             {
+//                 $match: {
+//                     "teacher": mongoose.Types.ObjectId(teacher),
+//                     "date": {$gte: start, $lt: end} 
+//                 }
+//             },
+//             {
+//                 $group: {
+//                     _id: '$student',
+//                     total_lookafter_late_1: {
+//                         $sum: "$lookAfterLate1"
+//                     },
+//                     total_lookafter_late_2: {
+//                         $sum: "$lookAfterLate2"
+//                     },
+//                     total_valid_absence: {
+//                         $sum: "$lateForSchool1"
+//                     },
+//                     total_invalid_absence: {
+//                         $sum: "$lateForSchool2"
+//                     }
+//                 }
+//             }
 
-        ])
-        console.log(allStudentTuitions)
+//         ])
+//         console.log(allStudentTuitions)
 
-        // sử dụng thằng ở trên để uppdate vào tuition database
-        for (const tuition of allStudentTuitions) {
-            saveTuition(tuition, teacher, date)
-        }
+//         // sử dụng thằng ở trên để uppdate vào tuition database
+//         for (const tuition of allStudentTuitions) {
+//             saveTuition(tuition, teacher, date)
+//         }
         
 
-        return allStudentTuitions
-    } catch (err) {
-        console.log(err)
-    }
+//         return allStudentTuitions
+//     } catch (err) {
+//         console.log(err)
+//     }
 
 
-}
+// }
 
-async function saveTuition(tuition, teacher, date) {
-    let newTuition = new Tuition({
-        teacher: teacher,
-        student: tuition._id,
-        date: date,
-        validAbsence: tuition.total_valid_absence,
-        invalidAbsence: tuition.total_invalid_absence,
-        late1: tuition.total_lookafter_late_1,
-        late2: tuition.total_lookafter_late_2,
-    })
+// async function saveTuition(tuition, teacher, date) {
+//     let newTuition = new Tuition({
+//         teacher: teacher,
+//         student: tuition._id,
+//         date: date,
+//         validAbsence: tuition.total_valid_absence,
+//         invalidAbsence: tuition.total_invalid_absence,
+//         late1: tuition.total_lookafter_late_1,
+//         late2: tuition.total_lookafter_late_2,
+//     })
     
-    try {
-        newTuition.save()
-        console.log('save tuition ok')
-    } catch (err) {
-        console.log('cannot save new tuition')
-    }
-}
+//     try {
+//         newTuition.save()
+//         console.log('save tuition ok')
+//     } catch (err) {
+//         console.log('cannot save new tuition')
+//     }
+// }

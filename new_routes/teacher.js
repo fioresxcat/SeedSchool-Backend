@@ -8,13 +8,15 @@ router.post('/api/teacher/login', teacherController.login)
 
 // -------------------------------- thong tin hoc sinh ---------------------------------
 // xem bang quan ly thong tin hoc sinh
+//ok
 router.get('/api/teacher/getstudents', checkTeacherRole, teacherController.getStudents)
 // xem thong tin hoc sinh cu the
+//ok
 router.get('/api/teacher/getstudent/:id', checkTeacherRole, teacherController.getStudent)
 // sua thong tin hoc sinh cu the
-router.get('/api/teacher/editstudent/:id', checkTeacherRole, teacherController.editStudent)
+router.put('/api/teacher/editstudent/:id', checkTeacherRole, teacherController.editStudent)
 // xoa hoc sinh cu the
-router.get('/api/teacher/deletestudent/:id', checkTeacherRole, teacherController.deleteStudent)
+router.delete('/api/teacher/deletestudent/:id', checkTeacherRole, teacherController.deleteStudent)
 // them hoc sinh
 router.post('/api/teacher/addstudent', checkTeacherRole, teacherController.addStudent)
 
@@ -32,14 +34,16 @@ router.post('/api/teacher/addlogbook', checkTeacherRole, teacherController.addLo
 // ------------------------------------ thoi khoa bieu -----------------------------------------
 // xem thoi khoa bieu
 router.get('/api/teacher/getschedule', checkTeacherRole, teacherController.getSchedule)
-// them hoat dong tkb
-router.post('/api/teacher/addschedule', checkTeacherRole, teacherController.addActivitySchedule)
-// sua hoat dong tkb
-router.put('/api/teacher/editschedule', checkTeacherRole, teacherController.editActivitySchedule)
-// xoa hoa dong tkb
-router.delete('/api/teacher/deleteschedule', checkTeacherRole, teacherController.deleteActivitySchedule)
+// them tkb
+router.post('/api/teacher/addactivity', checkTeacherRole, teacherController.addActivitySchedule)
+// sua tkb
+router.put('/api/teacher/editactivity', checkTeacherRole, teacherController.editActivitySchedule)
+// xoa tkb
+router.delete('/api/teacher/deleteactivity', checkTeacherRole, teacherController.deleteActivitySchedule)
 
 // ------------------------------- hoc phi ----------------------------
 // xem hoc phi theo thang
-router.get('/api/teacher/tuition', checkTeacherRole, teacherController.getTuition)
+// router.get('/api/teacher/gettuition', checkTeacherRole, teacherController.getTuition)
 // 
+
+module.exports = router
