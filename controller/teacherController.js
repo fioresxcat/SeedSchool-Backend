@@ -1,9 +1,12 @@
 const Teacher = require('../models/teacher')
 const Student = require('../models/student')
-const Parent = require('../models/student')
+const Parent = require('../models/parent')
 const LogBook = require('../models/logBook')
 const Tuition = require('../models/tuition')
-// const ActivitySchedule = require('../models/activitySchedule')
+const Schedule = require('../models/schedule')
+const ParentMail = require('../models/parentMail')
+const TeacherMail = require('../models/teacherMail')
+
 const jwt = require('jsonwebtoken')
 
 
@@ -78,12 +81,17 @@ const getStudent = async (req, res) => {
 }
 
 const addStudent = async (req, res) => {
+    console.log('API add student called')
+
     const { sInfo, pInfo } = req.body
+    // console.log(sInfo)
     const { sName, sBirth, sSex } = sInfo
+    // console.log(sName, sBirth, sSex)
     const { pUserName, pPassword, pName, pBirth, pSex, pPhoneNumber, pAddress } = pInfo
+    // console.log(pUserName, pPassword, pName, pBirth, pSex, pPhoneNumber, pAddress)
 
     let newParent = new Parent({
-        userName: pUserName,
+        username: pUserName,
         password: pPassword,
         role: 'parent',
         name: pName,
@@ -93,23 +101,33 @@ const addStudent = async (req, res) => {
         address: pAddress
     })
 
+    // console.log(newParent)
+
     try {
         const parent = await newParent.save()
-        let newStudent = new Student({
-            name: sName,
-            birth: new Date(sBirth),
-            sex: sSex,
-            teacher: req.teacher,
-            parent: parent
-        })
-        newStudent.save((err, rs) => {
-            if (err) {
-                return res.json({ status: 'fail', msg: 'cannot save new student' })
-            } else {
-                return res.json({ status: 'ok', msg: 'save new student ok', student: newStudent })
-            }
-        })
+        // console.log(parent)
+        if (parent) {
+            // console.log(parent)
+            let newStudent = new Student({
+                name: sName,
+                birth: new Date(sBirth),
+                sex: sSex,
+                teacher: req.teacher,
+                parent: parent
+            })
+            newStudent.save((err, rs) => {
+                if (err) {
+                    return res.json({ status: 'fail', msg: 'cannot save new student' })
+                } else {
+                    return res.json({ status: 'ok', msg: 'save new student ok', student: newStudent })
+                }
+            })
+        } else {
+            console.log('save parent fail')
+            console.log(parent)
+        }
     } catch (err) {
+        console.log(err)
         return res.json({ status: 'fail', msg: 'cannot save new parent' })
     }
 }
@@ -117,6 +135,7 @@ const addStudent = async (req, res) => {
 
 
 // edit student with id param
+//ok
 const editStudent = async (req, res) => {
     let student
     try {
@@ -141,6 +160,7 @@ const editStudent = async (req, res) => {
             student.parent.address = pAddress
 
             await student.save()
+            await student.parent.save()
             return res.json({ status: 'ok', msg: 'edit student ok', student: student })
         } else {
             return res.json({ status: 'fail', msg: 'cannot find student with this id to edit' })
@@ -157,17 +177,21 @@ const editStudent = async (req, res) => {
 
 
 // delete student with id
+//ok
 const deleteStudent = async (req, res) => {
     let student
     try {
-        student = await Student.findById(req.params.id)
+        student = await Student.findById(req.params.id).populate('parent')
         if (student) {
+            await LogBook.deleteMany({ student: student })
             await student.remove()
-            return res.json({ status: 'ok', msg: 'delete student ok' })
+            await student.parent.remove()
+            return res.json({ status: 'ok', msg: 'delete student and parent ok' })
         } else {
             return res.json({ status: 'fail', msg: 'cannot find student with this id to delete' })
         }
     } catch (err) {
+        console.log(err)
         if (student != null) {
             return res.json({ status: 'fail', msg: 'cannot delete student with this id' })
         } else {
@@ -184,23 +208,24 @@ const deleteStudent = async (req, res) => {
 // + neu co ngay + ko student => tra ve danh sach logbook trong ngay do
 // + neu ko co ngay + co student => tra ve danh sach logbook cho student do
 const getLogBooks = async (req, res) => {
-    const date = new Date(req.query.date) // co the sua thanh req.query
-    const student = req.query.student
-    if (date) { // nếu có ngày gửi lên
+    const { date, student } = req.query
+    console.log(date, student)
+
+    if (date && student) { // nếu có ngày + student gửi lên
         try {
-            const logBooks = await LogBook.find({ date: date, teacher: req.teacher._id, student: student._id })
-            if (logBooks || logBooks.length) {
-                return res.json({ status: 'ok', msg: 'get logbook ok', logBooks: logBooks })
+            const logBook = await LogBook.find({ date: new Date(date), teacher: req.teacher, student: student })
+            if (logBook) {
+                return res.json({ status: 'ok', msg: 'get logbook ok', logBooks: logBook })
             } else {
                 return res.json({ status: 'fail', msg: 'cannot get logbook with this date and teacher id' })
             }
         } catch (err) {
-            console.log('Server error get logbook by student')
+            console.log(err)
             return res.json({ status: 'ok', msg: 'Server error get logbook by student' })
         }
-    } else if (!date && !student) { // sử dụng cho lần load trang đầu tiên
+    } else if (!date && !student) { // sử dụng cho lần load trang đầu tiên, hien thi logbook trong ngay moi nhat
         try {
-            const logBooks = await LogBook.find({}).sort({ date: -1 })
+            const logBooks = await LogBook.find({ teacher: req.teacher }).sort({ date: -1 })
             if (logBooks.length) {
                 const lastestDate = logBooks[0].date
                 const latestLogBooks = logBooks.filter(logBook => logBook.date.getTime() === lastestDate.getTime())
@@ -212,8 +237,33 @@ const getLogBooks = async (req, res) => {
             console.log('server error get logbooks for teacher')
             return res.json({ status: 'fail', msg: 'server error get logbooks for teacher' })
         }
+    } else if (date && !student) { // co ngay + ko student: hien thi logbook trong ngay do
+        try {
+            const logBooks = await LogBook.find({ date: new Date(date), teacher: req.teacher })
+            if (logBooks) {
+                return res.json({ status: 'ok', msg: 'get logbook with date and no student ok', logBooks: logBooks })
+            } else {
+                return res.json({ status: 'fail', msg: 'no logbook with this date' })
+            }
+        } catch (err) {
+            console.log(err)
+            return res.json({ status: 'ok', msg: err.message })
+        }
+    } else if (!date && student) {
+        try {
+            const logBooks = await LogBook.find({ teacher: req.teacher, student: student }).sort({ date: -1 })
+            if (logBooks.length) {
+                return res.json({ status: 'ok', msg: 'get logbook fr this student ok', logBooks: logBooks })
+            } else {
+                return res.json({ status: 'fail', msg: 'logbook with this student not found' })
+            }
+        } catch (err) {
+            console.log(err)
+            return res.json({ status: 'fail', msg: eerr.message })
+        }
     }
 }
+
 
 
 const editLogBook = async (req, res) => {
@@ -221,7 +271,7 @@ const editLogBook = async (req, res) => {
     const { attendancePicture, schedule, comment, lookAfterLate, lateForSchool } = req.body
     let logBook
     try {
-        logBook = await LogBook.findOne({ student: student._id, date: new Date(date) })
+        logBook = await LogBook.findOne({ teacher: req.teacher, student: student._id, date: new Date(date) })
         if (logBook) {
             logBook.attendancePicture = attendancePicture
             logBook.schedule = schedule
@@ -246,7 +296,7 @@ const editLogBook = async (req, res) => {
 
 // add a new logbook
 const addLogBook = async (req, res) => {
-    const { student, teacher, date, attendancePicture, schedule, comment, lookAfterLate, lateForSchool } = req.body
+    const { student, date, attendancePicture, schedule, comment, lookAfterLate, lateForSchool } = req.body
     let logBook = new LogBook({
         student: student,
         teacher: teacher,
@@ -268,31 +318,32 @@ const addLogBook = async (req, res) => {
 }
 
 
+
+
+// ----------------------------------- Thoi khoa bieu -----------------------------------------------
 // xem thoi khoa bieu của một ngày
 // + trả về một danh sách các hoạt động có trong ngày đó
 const getSchedule = async (req, res) => {
-    const date = new Date(req.query.date)
+    const date = req.query.date
     if (date) {
         try {
-            const activitySchedules = await ActivitySchedule.find({ teacher: req.teacher._id, date: date })
-            if (activitySchedules) {
-                return res.json({ status: 'ok', msg: 'get activity schedule ok', activitySchedules: activitySchedules })
+            const schedules = await Schedule.find({ teacher: req.teacher, date: new Date(date) })
+            if (schedules) {
+                return res.json({ status: 'ok', msg: 'get schedule with date ok', schedules: schedules })
             } else {
-                return res.json({ status: 'fail', msg: 'cannot find any activity with this teacher and date' })
+                return res.json({ status: 'fail', msg: 'cannot find any schedule with this teacher and date' })
             }
         } catch (err) {
-            console.log('server error getting activity schedule: ' + err.message)
+            console.log(err)
             return res.json({ status: 'fail', msg: err.message })
         }
     } else {
         try {
-            const allActivitySchedules = ActivitySchedule.find({}).sort({ date: -1 })
-            const latestDate = allActivitySchedules[0].date
-            const latestActivitySchedules = (await allActivitySchedules).filter(activity => activity.date.getTime() === latestDate.getTime())
-            return res.json({ status: 'ok', msg: 'get latest activity ok', activitySchedules: latestActivitySchedules })
+            const latestSchedule = await Schedule.find({ teacher: req.teacher }).sort({ date: -1 }).limit(1)
+            return res.json({ status: 'ok', msg: 'get latest activity ok', schedules: latestSchedule })
         } catch (err) {
-            console.log('server error getting activity schedule: ' + err.message)
-            return res.json({ status: 'ok', msg: err.message })
+            console.log(err)
+            return res.json({ status: 'fail', msg: err.message })
         }
     }
 }
@@ -300,100 +351,108 @@ const getSchedule = async (req, res) => {
 
 // thêm hoạt động thời khóa biểu
 const addActivitySchedule = async (req, res) => {
-    const teacher = req.teacher
-    const { date, start, end, name, content } = req.body
-    let activitySchedule = new ActivitySchedule({
-        teacher: teacher,
-        date: date,
-        start: start,
-        end: end,
-        name: name,
-        content: content
-    })
-
+    const { scheduleId, newActivity } = req.body
     try {
-        const newActivitySchedule = await activitySchedule.save()
-        return res.json({ status: 'ok', msg: 'add activity schedule ok', activitySchedule: newActivitySchedule })
+        const schedule = await Schedule.findById(scheduleId)
+        if (schedule) {
+            schedule.activityList.push(newActivity)
+            schedule.save((err, rs) => {
+                if (err) {
+                    console.log(err)
+                    return res.json({ status: 'fail', msg: 'cannot add activity to schedule' })
+                } else {
+                    return res.json({ status: 'ok', msg: 'add activity to schedule ok', schedule: schedule })
+                }
+            })
+        } else {
+            console.log(schedule)
+            return res.json({ status: 'fail', msg: 'cannot find schedule to add activity' })
+        }
     } catch (err) {
-        console.log('server error adding activity schedule: ' + err.message)
+        console.log(err)
         return res.json({ status: 'fail', msg: err.message })
     }
 }
 
 // sua hoat dong thoi khoa bieu
 const editActivitySchedule = async (req, res) => {
-    const teacher = req.teacher
-    const { id, date, start, end, name, content } = req.body // id được gửi lên bởi client
-    let activitySchedule
+    const scheduleId = req.params.id
+    const { editedSchedule, index } = req.body
     try {
-        activitySchedule = await ActivitySchedule.findById(id)
-        if (activitySchedule) {
-            activitySchedule.start = new Date(start)
-            activitySchedule.end = new Date(end)
-            activitySchedule.name = name
-            activitySchedule.content = content
-            await activitySchedule.save()
-            return res.json({ status: 'ok', msg: 'edit activity schedule ok', activitySchedule: activitySchedule })
+        let schedule = await Schedule.findById(scheduleId)
+        if (schedule) {
+            schedule.activityList[index] = editedSchedule
+            schedule.save((err, doc) => {
+                if (err) {
+                    console.log(err)
+                    return res.json({ status: 'ok', msg: err.message })
+                } else {
+                    return res.json({ status: 'ok', msg: 'edit activity schedule ok', schedule: doc })
+                }
+            })
         } else {
-            return res.json({ status: 'fail', msg: 'cannot find activity to update' })
+            console.log(schedule)
+            return res.json({ status: 'fail', msg: 'cannot find schedule to edit activity' })
         }
     } catch (err) {
-        if (activitySchedule != null) {
-            console.log('error saving activity schedule: ' + err.message)
-            return res.json({ status: 'fail', msg: err.message })
-        } else {
-            console.log('server error saving activity: ' + err)
-            return res.json({ status: 'fail', msg: err.message })
-        }
+        console.log(err)
+        return res.json({ status: 'fail', msg: err.message })
     }
 }
 
 // xoa hoat dong tkb
 const deleteActivitySchedule = async (req, res) => {
-    const id = req.body.id
-    let activitySchedule
+    const scheduleId = req.params.id
+    const index = req.body.index
     try {
-        activitySchedule = await ActivitySchedule.findById(id)
-        if (activitySchedule) {
-            await activitySchedule.remove()
-            return res.json({ status: 'ok', msg: 'delete activity ok' })
+        let schedule = await Schedule.findById(scheduleId)
+        if (schedule) {
+            schedule.activityList.splice(index, 1)
+            schedule.save((err, doc) => {
+                if (err) {
+                    console.log(err)
+                    return res.json({ status: 'ok', msg: err.message })
+                } else {
+                    return res.json({ status: 'ok', msg: 'delete activity schedule ok', schedule: doc })
+                }
+            })
         } else {
-            return res.json({ status: 'fail', msg: 'cannot find activity to delete' })
+            console.log(schedule)
+            return res.json({ status: 'fail', msg: 'cannot find schedule to edit activity' })
         }
     } catch (err) {
-        if (activitySchedule != null) {
-            console.log('error deleting activity schedule: ' + err.message)
-            return res.json({ status: 'fail', msg: err.message })
-        } else {
-            console.log('server error deleting activity: ' + err)
-            return res.json({ status: 'fail', msg: err.message })
-        }
+        console.log(err)
+        return res.json({ status: 'fail', msg: err.message })
     }
 }
 
 
 // ------------------------------- hoc phí -----------------------------------
 const getTuitions = async (req, res) => {
-    const date = new Date(req.query.date)
+    const time = req.query.time
 
-    if (!date) { // nếu ko có date gửi lên, tức là lần đầu bấm vào trang
-        if (new Date(date.getTime() + 86400000).getDate() === 1) {
-            // neu la ngay cuoi cung cua thang
-            // cap nhat hoc phi cua thang nay
-            const tuitions = updateTuition(req.teacher, date)
-            return res.json({ status: 'ok', msg: 'update tuition ok', tuitions: tuitions })
-        } else {
-            return res.json({ status: 'fail', msg: 'date is not the end of month' })
+    if (!time) { // nếu ko có thang gửi lên, hiển thị dữ liệu học phí của tháng gần nhất trong csdl
+        try {
+            const tuitions = await Tuition.find({ teacher: req.teacher }).sort({ date: -1 }).limit(req.teacher.numStudent)
+            if (tuitions.length) {
+                return res.json({ status: 'ok', msg: 'get tuition for latest month ok', tuitions: tuitions })
+            } else {
+                return res.json({ status: 'fail', msg: 'cannot find tuition with this teacher' })
+            }
+        } catch (err) {
+            console.log(err)
+            return res.json({ status: 'fail', msg: err.message })
         }
-    } else {
-        const month = date.getMonth() + 1
-        const year = date.getFullYear()
+    } else { // neu co thang gui len, hien thi hoc phi cua thang do
+        const month = parseInt(time.split('-')[1])
+        const year = parseInt(time.split('-')[0])
         const start = `${year}-${month}-01`
-        const end = `${year}-${month + 1}-01`
+        const end = `${year}-${month+1}-01`
+
         try {
             const tuitions = await Tuition.find({
                 teacher: req.teacher,
-                date: { $gte: start, $lt: end }
+                date: { $gte: new Date(start), $lt: new Date(end) }
             })
             if (tuitions) {
                 return res.json({ status: 'ok', msg: 'get tuitions with date ok', tuitions: tuitions })
@@ -409,7 +468,73 @@ const getTuitions = async (req, res) => {
 }
 
 
+// ------------------------------------------- hom thu ----------------------------------------
+// xem tat ca mail
+const getAllMail = async (req, res) => {
+    try {
+        const mails = await TeacherMail.find({ teacher: req.teacher })
+        if (mails.length) {
+            return res.json({ status: 'ok', msg: 'get mailbox for teacher ok', mails: mails })
+        } else {
+            console.log(mails)
+            return res.json({ status: 'fail', msg: 'mailbox for this teacher not found' })
+        }
+    } catch (err) {
+        console.log(err)
+        return res.json({ status: 'fail', msg: err.message })
+    }
+}
 
+// xem chi tiet mail dua vao id client truyen len
+const getDetailMail = async (req, res) => {
+    try {
+        const mail = await TeacherMail.findById(req.params.id)
+        if (mail) {
+            return res.json({ status: 'ok', msg: 'get mail detail ok', mail: mail })
+        } else {
+            console.log(mail)
+            return res.json({ status: 'fail', msg: 'mail with this id not found' })
+        }
+    } catch (err) {
+        console.log(err)
+        return res.json({ status: 'fail', msg: err.message })
+    }
+}
+
+// gui thong bao hoc phi
+const sendTuitionNoti = async (req, res) => {
+    try {
+        const tuitions = await Tuition.find({ teacher: req.teacher }).populate('student').sort({ date: -1 }).limit(req.teacher.numStudent)
+        if (tuitions.length) {
+            for (const tuition of tuitions) {
+                let content = `
+                Nhà trường xin thông báo chi tiết về học phí tháng ${tuition.date.getMonth()} của cháu ${tuition.student.name}
+                
+                Học phí cơ bản: ${tuition.baseTuition} triệu / tháng
+                Số buổi nghỉ có phép: ${tuition.validAbsence}
+                Số buổi nghỉ không phép: ${tuition.invalidAbsence}
+                Số buổi trông muộn trước 5 rưỡi chiều: ${tuition.late1}
+                Số buổi trông muộn sau 5 rưỡi chiều: ${tuition.late2}
+
+                Tổng cộng học phí tháng: ${tuition.totalTuition}
+
+                Kính mong quý phụ huynh đóng học phí đầy đủ và đúng hạn. Nhà trường xin cảm ơn!
+                `
+                let mail = new ParentMail({
+                    parent: tuition.student.parent,
+                    title: 'Thông báo học phí',
+                    content: content
+                })
+                await mail.save()
+            }
+        } else {
+            return res.json({ status: 'fail', msg: 'cannot find tuitions with this teacher' })
+        }
+    } catch (err) {
+        console.log(err)
+        return res.json({ status: 'fail', msg: err.message })
+    }
+}
 
 // ---------------------------------------- ultility functions ----------------------------------------
 async function updateTuition(teacher, date) {
@@ -496,3 +621,4 @@ module.exports.addActivitySchedule = addActivitySchedule
 module.exports.editActivitySchedule = editActivitySchedule
 module.exports.deleteActivitySchedule = deleteActivitySchedule
 module.exports.getTuitions = getTuitions
+module.exports.sendTuitionNoti = sendTuitionNoti

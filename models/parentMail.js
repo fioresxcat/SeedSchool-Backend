@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const parentMailBoxSchema = new Schema({
+const parentMailSchema = new Schema({
     parent: {
         type: mongoose.SchemaTypes.ObjectId,
         required: true,
@@ -10,6 +10,11 @@ const parentMailBoxSchema = new Schema({
     },
     date: {
         type: Date,
+        required: true,
+        default: Date.now()
+    },
+    title: {
+        type: String,
         required: true
     },
     content: {
@@ -17,7 +22,7 @@ const parentMailBoxSchema = new Schema({
         required: true
     }    
 }, {
-    collection: "parentMailBoxs"
+    collection: "parentMails"
 }) 
-module.exports = mongoose.model("parentMailBox",parentMailBoxSchema);
+module.exports = mongoose.model("parentMail",parentMailSchema);
 

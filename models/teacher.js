@@ -1,41 +1,54 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  age:{
-    type:Number,
-    required: true
-  },
-  SDT:{
-    type:String,
-    required: true
-  },
-  className: {
-    type: String,
-    required: true
-  },
-  username: {
-    type: String,
-    required: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  date: {
-    type: Date,
-    default: Date.now
-  },
-  role: {
-    type: String,
-    required: true,
-    default:'teacher'
-  }
-});
+const Schema = mongoose.Schema;
 
-const Teacher= mongoose.model('Teacher', UserSchema);
+const teacherSchema = new Schema({
+    username: {
+        type: String,
+        required: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    role: {
+        type: String,
+        enum: ['teacher'],
+        required: true
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    birth: {
+        type: Date,
+        required: true
+    },
+    sex: {
+        type: String,
+        enum: ["Nam","Nữ"],
+        required: true
+    },
+    phoneNumber: {
+        type: String,
+        required: true
+    },
+    // class: {
+    //     type: mongoose.SchemaTypes.ObjectId,
+    //     required: true,
+    //     ref: "class"
+    // },
+    class: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    numStudent: {
+        type: Number
+    }
+}, {
+    collection: "teachers"
+})
 
-module.exports = Teacher;
+module.exports = mongoose.model("teacher",teacherSchema);
+

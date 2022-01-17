@@ -4,7 +4,8 @@ const Parent = require('./models/parent')
 const Student = require('./models/student')
 const Teacher = require('./models/teacher')
 const LogBook = require('./models/logBook')
-const ActivitySchedule = require('./models/activitySchedule')
+const ParentMail = require('./models/parentMail')
+const TeacherMail = require('./models/teacherMail')
 const Tuition = require('./models/tuition')
 const Test = require('./models/test')
 const Schedule = require('./models/schedule')
@@ -47,22 +48,22 @@ const teacher = new Teacher({
     username: 'longnd',
     password: '20194100',
     role: 'teacher',
-    name: "Nguyen Duc Long",
-    birth: new Date(Date.UTC(2001, 8, 5)),
+    name: "nguyen duc long",
+    birth: new Date(Date.UTC(2001, 9, 6)),
     sex: "Nam",
-    phoneNumber: "0852252482",
+    phoneNumber: "0123456789",
     class: '1B'
 })
-// save(teacher)
+//save(teacher)
 
-const activitySchedule = new ActivitySchedule({
-    teacher: '61ca8c2b5877b1ca3bbad3d1',
-    date: new Date(Date.UTC(2022, 0, 10)),
-    startTime: new Date(Date.UTC(2022, 0, 14, 20, 0, 0)),
-    endTime: new Date(Date.UTC(2022, 0, 14, 21, 0, 0)),
-    name: 'di ngu trung',
-    content: 'di ngu nao trung'
-})
+// const activitySchedule = new ActivitySchedule({
+//     teacher: '61ca8c2b5877b1ca3bbad3d1',
+//     date: new Date(Date.UTC(2022, 0, 10)),
+//     startTime: new Date(Date.UTC(2022, 0, 14, 20, 0, 0)),
+//     endTime: new Date(Date.UTC(2022, 0, 14, 21, 0, 0)),
+//     name: 'di ngu trung',
+//     content: 'di ngu nao trung'
+// })
 // save(activitySchedule)
 
 const schedule = new Schedule({
@@ -97,9 +98,20 @@ const logBook = new LogBook({
 })
 // save(logBook)
 
-const admin = new Admin({
-
+const parentMail = new ParentMail({
+    parent: '61e3f886d5769c9cdcb07b0c',
+    title: 'di choi tet',
+    content: 'cho cac chau di choi tet'
 })
+// save(parentMail)
+
+const teacherMail = new TeacherMail({
+    teacher: '61e5225a387ce5e62d91ebe1',
+    parent: '61e3f886d5769c9cdcb07b0c',
+    title: ' don xin nghi hoc',
+    content: 'em xin cho chau nghi hoc di choi ga'
+})
+// save(teacherMail)
 
 async function findParent(student) {
     const parent = await Parent.findById(student.parent)

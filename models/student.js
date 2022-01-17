@@ -41,9 +41,9 @@ studentSchema.virtual('parentPhoneNumber').get(function() {
 })
 
 // virtual method:address
-studentSchema.virtual('address').get(function() {
-    return this.parent.address
-})
+// studentSchema.virtual('address').get(function() {
+//     return this.parent.address
+// })
 
 module.exports = mongoose.model("student", studentSchema)  
 
