@@ -281,19 +281,21 @@ const getLogBooks = async (req, res) => {
 const getLogBook = async (req, res) => {
     try {
         const logBook = await LogBook.findById(req.params.id)
-        if(logBook) {
-            return res.json({status:'ok', msg:'get single logbook ok', logBook: logBook})
+        if (logBook) {
+            return res.json({ status: 'ok', msg: 'get single logbook ok', logBook: logBook })
         } else {
-            return res.json({status:'fail', msg:'cannot get logbook with this id'})
+            return res.json({ status: 'fail', msg: 'cannot get logbook with this id' })
         }
-    } catch(err) {
+    } catch (err) {
         console.log(err)
         return res.json({ status: 'fail', msg: err.message })
     }
 }
 
 const editLogBook = async (req, res) => {
+    console.log('ok dang goi vao edit dayyyyyyy')
     const { attendancePicture, comment, status, lookAfterLate } = req.body.logbook
+    console.log(attendancePicture, comment, status, lookAfterLate)
     let lookAfterLate1, lookAfterLate2, lateForSchool1, lateForSchool2
 
     if (status == "Đi học") {
@@ -324,13 +326,20 @@ const editLogBook = async (req, res) => {
         if (logBook) {
             logBook.attendancePicture = attendancePicture
             logBook.comment = comment
-            logBook.lookAfterLate1= lookAfterLate1
-            logBook.lookAfterLate2= lookAfterLate2
-            logBook.lateForSchool1= lateForSchool1
-            logBook.lateForSchool2= lateForSchool2
+            logBook.lookAfterLate1 = lookAfterLate1
+            logBook.lookAfterLate2 = lookAfterLate2
+            logBook.lateForSchool1 = lateForSchool1
+            logBook.lateForSchool2 = lateForSchool2
 
-            await logBook.save()
-            return res.json({ status: 'ok', msg: 'edit logbook with student and date ok', logBook: logBook })
+            logBook.save((err, doc) => {
+                if (err) {
+                    console.log(err)
+                    return res.json({ status: 'fail', msg: err.message })
+                } else {
+                    return res.json({ status: 'ok', msg: 'edit logbook with student and date ok', logBook: doc })
+                }
+            })
+
         } else {
             return res.json({ status: 'fail', msg: 'cannot find logBook with this student and date' })
         }
