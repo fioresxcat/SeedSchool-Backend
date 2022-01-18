@@ -17,7 +17,7 @@ const logBookSchema = new Schema({
     date: {
         type: Date,
         required: true,
-        default: convertDateToUTC(Date.now())
+        default: new Date()
     },
     attendancePicture: {
         type: String,
@@ -67,4 +67,4 @@ module.exports = mongoose.model("logBook", logBookSchema);
 // + thêm logbook cho ngày mới
 // + sửa logbook
 
-function convertDateToUTC(date) { return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); }
+// function convertDateToUTC(date) { return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); }
