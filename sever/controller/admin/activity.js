@@ -33,9 +33,8 @@ exports.create = async (req, res) => {
 // retrieve and return all users/ retrive and return a single user
 exports.find = async (req, res) => {
 
-    try {
-        if (req.query.id) {
-            const id = req.query.id;
+   try{ if(req.params.id){
+        const id = req.params.id;
 
             await Activity.findById(id).populate('registerList')
                 .then(data => {

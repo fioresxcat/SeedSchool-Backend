@@ -48,8 +48,8 @@ exports.add = (req, res) => {
 
 exports.find = async(req, res) => {
   try{
-    if(req.query.id){
-      const id = req.query.id;
+    if(req.params.id){
+      const id = req.params.id;
 
       await Teacher.findById(id)
           .then(data =>{
