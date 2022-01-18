@@ -23,7 +23,7 @@ const parentMailSchema = new Schema({
     },
     category: {
         type: String,
-        enum: ["học phí", "hoạt động chung"],
+        enum: ["Học phí", "Hoạt động chung"],
         required: true
     },
     registered: {
