@@ -126,6 +126,7 @@ exports.delete = (req, res) => {
 
 exports.sendNoti = async (req, res) => {
     const id = req.params.id
+    console.log(id)
     try {
         const activity = await Activity.findById(id)
         const allParents = await Parent.find({})
@@ -153,6 +154,7 @@ exports.sendNoti = async (req, res) => {
             })
             mail.save((err, doc) => {
                 if(err){
+                    console.log('errr roiiiiiiiii')
                     console.log(err)
                     return res.status(500).json({ success: false, message: err.message })
                 }
