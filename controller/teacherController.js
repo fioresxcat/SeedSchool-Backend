@@ -227,7 +227,7 @@ const getLogBooks = async (req, res) => {
 
     if (date && student) { // nếu có ngày + student gửi lên
         try {
-            const logBook = await LogBook.find({ date: new Date(date), teacher: req.teacher, student: student })
+            const logBook = await LogBook.find({ date: new Date(date), teacher: req.teacher, student: student }).populate('student')
             if (logBook) {
                 return res.json({ status: 'ok', msg: 'get logbook ok', logBooks: logBook })
             } else {
@@ -239,7 +239,7 @@ const getLogBooks = async (req, res) => {
         }
     } else if (!date && !student) { // sử dụng cho lần load trang đầu tiên, hien thi logbook trong ngay moi nhat
         try {
-            const logBooks = await LogBook.find({ teacher: req.teacher }).sort({ date: -1 })
+            const logBooks = await LogBook.find({ teacher: req.teacher }).populate('student').sort({ date: -1 })
             if (logBooks.length) {
                 const lastestDate = logBooks[0].date
                 const latestLogBooks = logBooks.filter(logBook => logBook.date.getTime() === lastestDate.getTime())
@@ -253,7 +253,7 @@ const getLogBooks = async (req, res) => {
         }
     } else if (date && !student) { // co ngay + ko student: hien thi logbook trong ngay do
         try {
-            const logBooks = await LogBook.find({ date: new Date(date), teacher: req.teacher })
+            const logBooks = await LogBook.find({ date: new Date(date), teacher: req.teacher }).populate('student')
             if (logBooks) {
                 return res.json({ status: 'ok', msg: 'get logbook with date and no student ok', logBooks: logBooks })
             } else {
@@ -265,7 +265,7 @@ const getLogBooks = async (req, res) => {
         }
     } else if (!date && student) {
         try {
-            const logBooks = await LogBook.find({ teacher: req.teacher, student: student }).sort({ date: -1 })
+            const logBooks = await LogBook.find({ teacher: req.teacher, student: student }).populate('student').sort({ date: -1 })
             if (logBooks.length) {
                 return res.json({ status: 'ok', msg: 'get logbook fr this student ok', logBooks: logBooks })
             } else {
