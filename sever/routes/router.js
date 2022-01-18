@@ -18,11 +18,11 @@ router.post('/api/admin/login',check.checkLogin,  login.loginAdmin)
 
 
 //ManagerTeacher
-router.post('/api/admin/teacher',check.checkAdmin, teacher.add);
-router.get('/api/admin/teacher',check.checkAdmin, teacher.find);
+router.post('/api/admin/teacher', teacher.add);
+router.get('/api/admin/teacher', teacher.find);
 router.put('/api/admin/teacher/:id', teacher.update);
-router.delete('/api/admin/teacher/:id',check.checkAdmin, teacher.delete);
-router.get('/api/admin/teacher/:id', check.checkAdmin,teacher.find )
+router.delete('/api/admin/teacher/:id', teacher.delete);
+router.get('/api/admin/teacher/:id', teacher.find )
 
 
 //Activity

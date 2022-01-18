@@ -5,15 +5,11 @@ const bcrypt = require('bcryptjs');
 // Load User model
 const Teacher = require('../../../models/teacher')
 
-exports.add = (req, res) => {
-    const { name, age,username,className, password, password2,SDT } = req.body;
+exports.add =  (req, res) => {
+    const { name, birth ,username,className, password, password2,phoneNumber, sex, numStudent } = req.body;
 
     if (password != password2) {
       res.json({success:false, message: 'Passwords do not match' });
-    }
-  
-    if (password.length < 6) {
-      res.json({success:false, message: 'Password must be at least 6 characters' });
     }
      else {
       Teacher.findOne({ username: username }).then(user => {
@@ -22,25 +18,20 @@ exports.add = (req, res) => {
         } else {
           const newUser = new Teacher({
             name,
-            age,
             username,
             password,
             className,
-            SDT
+            phoneNumber,
+            numStudent,
+            sex,
+            birth
           });
-  
-          bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(newUser.password, salt, (err, hash) => {
-              if (err) throw err;
-              newUser.password = hash;
-              newUser
-                .save()
-                .then(user => {
-                  res.json({success:true, message:'Tạo tài khoản thành công'})
-                })
-                .catch(err => res.status(400).send({success:false, message:'Something went wrong'}));
-            });
-          });
+           newUser.save()
+          .then((data) => {
+            res.json({
+              success: true, message: '', user: newUser
+            })
+          })
         }
       });
     }
@@ -89,13 +80,13 @@ exports.update = (req, res)=>{
   Teacher.findByIdAndUpdate(id, req.body, { useFindAndModify: false})
       .then(data => {
           if(!data){
-              res.status(404).json({ susccess:false,message : `Cannot Update teacher with ${id}. Maybe teacher not found!`})
+              res.status(404).json({ success:false,message : `Cannot Update teacher with ${id}. Maybe teacher not found!`})
           }else{
               res.json({success:true, message:'Sửa thành công'})
           }
       })
       .catch(err =>{
-          res.status(500).json({susccess:false, message : "Error Update teacher information"})
+          res.status(500).json({success:false, message : "Error Update teacher information"})
       })
 }
 
@@ -108,14 +99,14 @@ exports.delete = (req, res)=>{
           if(!data){
               res.status(404).json({success:false, message : `Cannot Delete with id ${id}. Maybe id is wrong`})
           }else{
-              res.json({susccess:true,
+              res.json({success:true,
                   message : "Teacher was deleted successfully!"
               })
           }
       })
       .catch(err =>{
           res.status(500).json({
-              susccess:false,
+              success:false,
               message: "Could not delete teacher with id=" + id
           });
       });

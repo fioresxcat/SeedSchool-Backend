@@ -13,7 +13,7 @@ const teacherSchema = new Schema({
     },
     role: {
         type: String,
-        enum: ['teacher'],
+        default: 'teacher',
         required: true
     },
     name: {

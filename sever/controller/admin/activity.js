@@ -19,7 +19,8 @@ exports.create = async (req,res)=>{
     })
 
     await newActivity.save()
-    res.json({ success: true, message: 'Thêm thành công', activity : newActivity })
+    .then(res.json({ success: true, message: 'Thêm thành công', activity : newActivity }))
+    
     }catch{
             res.status(500).json({ success: false, message: 'Thất bại' })
         };
@@ -68,11 +69,11 @@ exports.findDate = async (req, res) => {
             if(data){
                 return res.json({activity: data })
             }else{
-                return res.json({susccess:false, message:"Không có hoạt động trong ngày này"})
+                return res.json({success:false, message:"Không có hoạt động trong ngày này"})
             }
         })
         .catch(err=>{
-            res.status(500).json({susccess:false, message : "Lỗi tìm kiếm"})
+            res.status(500).json({success:false, message : "Lỗi tìm kiếm"})
         })
 }
 
@@ -88,13 +89,13 @@ exports.update = (req, res)=>{
     Activity.findByIdAndUpdate(id, req.body, { useFindAndModify: false})
         .then(data => {
             if(!data){
-                res.status(404).json({ susccess:false,message : `Cannot Update activity with ${id}. Maybe user not found!`})
+                res.status(404).json({ success:false,message : `Cannot Update activity with ${id}. Maybe user not found!`})
             }else{
                 res.json({success:true, message:'Sửa thành công'})
             }
         })
         .catch(err =>{
-            res.status(500).json({susccess:false, message : "Error Update activity information"})
+            res.status(500).json({success:false, message : "Error Update activity information"})
         })
 }
 
@@ -107,14 +108,14 @@ exports.delete = (req, res)=>{
             if(!data){
                 res.status(404).json({success:false, message : `Cannot Delete with id ${id}. Maybe id is wrong`})
             }else{
-                res.json({susccess:true,
+                res.json({success:true,
                     message : "Activity was deleted successfully!"
                 })
             }
         })
         .catch(err =>{
             res.status(500).json({
-                susccess:false,
+                success:false,
                 message: "Could not delete activity with id=" + id
             });
         });
