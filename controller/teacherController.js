@@ -161,9 +161,21 @@ const editStudent = async (req, res) => {
             student.parent.phoneNumber = pPhoneNumber
             student.parent.address = pAddress
 
-            await student.save()
-            await student.parent.save()
-            return res.json({ status: 'ok', msg: 'edit student ok', student: student })
+            student.parent.save((err, doc) => {
+                if(err) {
+                    console.log(err)
+                    return res.json({status:'fail', msg: err.message})
+                } else {
+                    student.save((err, doc) => {
+                        if(err) {
+                            console.log(err)
+                            return res.json({status:'fail', msg: err.message})
+                        } else {
+                            return res.json({status:'ok', msg:'edit student ok', student: doc})
+                        }
+                    })
+                }
+            })
         } else {
             return res.json({ status: 'fail', msg: 'cannot find student with this id to edit' })
         }
