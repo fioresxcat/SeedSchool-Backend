@@ -443,13 +443,17 @@ const addActivitySchedule = async (req, res) => {
     const { scheduleId, date, newActivity } = req.body
     const start = newActivity.start
     const end = newActivity.end
+
     const year = parseInt(date.split('-')[0])
     const month = parseInt(date.split('-')[1])
     const day = parseInt(date.split('-')[2])
-    const timestart = new Date(Date.UTC(year, month, day, start.split('-')[0], start.split('-')[1]))
-    const timeend = new Date(Date.UTC(year, month, day, end.split('-')[0], end.split('-')[1]))
+    
+    const timestart = new Date(Date.UTC(year, month, day, start.split(':')[0], start.split(':')[1]))
+    const timeend = new Date(Date.UTC(year, month, day, end.split(':')[0], end.split(':')[1]))
     newActivity.start = timestart
     newActivity.end = timeend
+    console.log(newActivity.start)
+    console.log(newActivity.end)
     try {
         const schedule = await Schedule.findById(scheduleId)
         if (schedule) {
