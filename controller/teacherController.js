@@ -357,7 +357,7 @@ const addActivitySchedule = async (req, res) => {
         const schedule = await Schedule.findById(scheduleId)
         if (schedule) {
             for (const activity of schedule) {
-                if((activity.start < new Date(newActivity.start) && new Date(newActivity.start) < activity.end) || (activity.start < new Date(newActivity.end) && new Date(newActivity.end) < activity.end) {
+                if((activity.start < new Date(newActivity.start) && new Date(newActivity.start) < activity.end) || (activity.start < new Date(newActivity.end) && new Date(newActivity.end) < activity.end)) {
                     return res.json({status:'fail', msg:'time overlap with another activity'})
                 }
             }

@@ -11,29 +11,32 @@ exports.add =  (req, res) => {
     if (password != password2) {
       res.json({success:false, message: 'Passwords do not match' });
     }
-     else {
-      Teacher.findOne({ username: username }).then(user => {
-        if (user) {
-          res.json({success:false, message: 'Tài khoản đã tồn tại'})
-        } else {
-          const newUser = new Teacher({
-            name,
-            username,
-            password,
-            className,
-            phoneNumber,
-            numStudent,
-            sex,
-            birth
-          });
-           newUser.save()
-          .then((data) => {
-            res.json({
-              success: true, message: '', user: newUser
+    try{
+        Teacher.findOne({ username: username }).then(user => {
+          if (user) {
+            res.json({success:false, message: 'Tài khoản đã tồn tại'})
+          } else {
+            const newUser = new Teacher({
+              name,
+              username,
+              password,
+              className,
+              phoneNumber,
+              numStudent,
+              sex,
+              birth
+            });
+             newUser.save()
+            .then((data) => {
+              res.json({
+                success: true, message: 'Thêm thành công', user: newUser
+              })
             })
-          })
-        }
-      });
+          }
+        });
+    }catch(err){
+        console.log(err);
+        res.json({success:false, message: 'Them that bai'})
     }
 }
 
@@ -80,13 +83,13 @@ exports.update = (req, res)=>{
   Teacher.findByIdAndUpdate(id, req.body, { useFindAndModify: false})
       .then(data => {
           if(!data){
-              res.status(404).json({ success:false,message : `Cannot Update teacher with ${id}. Maybe teacher not found!`})
+              res.status(404).json({ success:false,message : `Không thể cập nhật giáo viên ${id}. Có thể không có giáo viên này!`})
           }else{
-              res.json({success:true, message:'Sửa thành công'})
+              res.json({success:true, message:'Cập nhật thành công'})
           }
       })
       .catch(err =>{
-          res.status(500).json({success:false, message : "Error Update teacher information"})
+          res.status(500).json({success:false, message : "Lỗi không thể cập nhật giáo viên, mời bạn nhập lại đúng"})
       })
 }
 
