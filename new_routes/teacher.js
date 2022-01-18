@@ -11,23 +11,23 @@ router.post('/api/teacher/login', teacherController.login)
 // xem bang quan ly thong tin hoc sinh
 //ok
 // return: students
-router.get('/api/teacher/getstudents', checkTeacherRole, teacherController.getStudents)
+router.get('/api/teacher/student', checkTeacherRole, teacherController.getStudents)
 
 // xem thong tin hoc sinh cu the
 //ok
-router.get('/api/teacher/getstudent/:id', checkTeacherRole, teacherController.getStudent)
+router.get('/api/teacher/student/:id', checkTeacherRole, teacherController.getStudent)
 
 // them hoc sinh cu the
 //ok
-router.post('/api/teacher/addstudent', checkTeacherRole, teacherController.addStudent)
+router.post('/api/teacher/student', checkTeacherRole, teacherController.addStudent)
 
 // sua thong tin hoc sinh cu the
 //ok
-router.put('/api/teacher/editstudent/:id', checkTeacherRole, teacherController.editStudent)
+router.put('/api/teacher/student/:id', checkTeacherRole, teacherController.editStudent)
 
 // xoa hoc sinh cu the
 //ok
-router.delete('/api/teacher/deletestudent/:id', checkTeacherRole, teacherController.deleteStudent)
+router.delete('/api/teacher/student/:id', checkTeacherRole, teacherController.deleteStudent)
 
 // --------------------------------- so theo doi -------------------------------------------------
 // xem so theo dõi
@@ -36,27 +36,27 @@ router.delete('/api/teacher/deletestudent/:id', checkTeacherRole, teacherControl
 // + neu co ngay + ko student => tra ve danh sach logbook trong ngay do
 // + neu ko co ngay + co student => tra ve danh sach logbook cho student do
 //ok
-router.get('/api/teacher/getlogbooks', checkTeacherRole, teacherController.getLogBooks)
+router.get('/api/teacher/logbook', checkTeacherRole, teacherController.getLogBooks)
 
 // sua so theo doi (1 hoc sinh + 1 ngay)
 //ok
-router.put('/api/teacher/editlogbook', checkTeacherRole, teacherController.editLogBook)
+router.put('/api/teacher/logbook', checkTeacherRole, teacherController.editLogBook)
 
 // them so theo doi (1 hoc sinh + 1 ngay)
 //ok
-router.post('/api/teacher/addlogbook', checkTeacherRole, teacherController.addLogBook)
+router.post('/api/teacher/logbook', checkTeacherRole, teacherController.addLogBook)
 
 
 // ------------------------------------ thoi khoa bieu -----------------------------------------
 // xem thoi khoa bieu
 // ok
-router.get('/api/teacher/getschedule', checkTeacherRole, teacherController.getSchedule)
+router.get('/api/teacher/schedule', checkTeacherRole, teacherController.getSchedule)
 // them tkb
-router.post('/api/teacher/addactivity', checkTeacherRole, teacherController.addActivitySchedule)
+router.post('/api/teacher/activity', checkTeacherRole, teacherController.addActivitySchedule)
 // sua tkb
-router.put('/api/teacher/editactivity', checkTeacherRole, teacherController.editActivitySchedule)
+router.put('/api/teacher/activity', checkTeacherRole, teacherController.editActivitySchedule)
 // xoa tkb
-router.delete('/api/teacher/deleteactivity', checkTeacherRole, teacherController.deleteActivitySchedule)
+router.delete('/api/teacher/activity', checkTeacherRole, teacherController.deleteActivitySchedule)
 
 // ------------------------------------- hoc phi ----------------------------
 // xem hoc phi theo thang

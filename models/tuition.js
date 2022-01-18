@@ -18,7 +18,7 @@ const tuitionSchema = new Schema({
         required: true
     },
     baseTuition: {
-        type: mongoose.SchemaTypes.Decimal128,
+        type: Number,
         required: true,
         default: 5
     },

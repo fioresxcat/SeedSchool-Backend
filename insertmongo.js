@@ -54,7 +54,7 @@ const teacher = new Teacher({
     phoneNumber: "0852252482",
     className: '1A'
 })
-save(teacher)
+// save(teacher)
 
 // const activitySchedule = new ActivitySchedule({
 //     teacher: '61ca8c2b5877b1ca3bbad3d1',
@@ -101,9 +101,10 @@ const logBook = new LogBook({
 const parentMail = new ParentMail({
     parent: '61e3f886d5769c9cdcb07b0c',
     title: 'di choi tet',
-    content: 'cho cac chau di choi tet'
+    content: 'cho cac chau di choi tet',
+    category: "Hoạt động chung"
 })
-// save(parentMail)
+save(parentMail)
 
 const teacherMail = new TeacherMail({
     teacher: '61e5225a387ce5e62d91ebe1',
@@ -146,15 +147,18 @@ async function save(entity) {
 //     }
 // })
 
-// updateTuition('61e5225a387ce5e62d91ebe1', new Date(Date.UTC(2022, 0, 31)))
+// updateTuition('61e69cbe8dcecb4422b7af0c', new Date(Date.UTC(2022, 1, 31)))
 // async function updateTuition(teacher, date) {
 //     let allStudentTuitions
 
 //     const month = date.getMonth()
 //     const year = date.getFullYear()
-//     const start = new Date(Date.UTC(year, month, 1))
-//     const end = new Date(Date.UTC(year, month+1, 1))
-
+//     const start = new Date(Date.UTC(year, month-1, 1))
+//     const end = new Date(Date.UTC(year, month, 1))
+//     console.log(month)
+//     console.log(year)
+//     console.log(start)
+//     console.log(end)
 //     try {
 //         allStudentTuitions = await LogBook.aggregate([
 //             {
