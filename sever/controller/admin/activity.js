@@ -154,7 +154,7 @@ exports.sendNoti = async (req, res) => {
             mail.save((err, doc) => {
                 if(err){
                     console.log(err)
-                    return res.status(500).json({ success: false, message: 'error send notification' })
+                    return res.status(500).json({ success: false, message: err.message })
                 }
             })
         }

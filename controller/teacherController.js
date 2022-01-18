@@ -573,7 +573,7 @@ const getTuitions = async (req, res) => {
         console.log(month, year)
         console.log(start)
         console.log(end)
-        
+
         try {
             const tuitions = await Tuition.find({
                 teacher: req.teacher,
@@ -594,7 +594,17 @@ const getTuitions = async (req, res) => {
 
 
 module.exports.updateCurrentTuition = async (req, res) => {
-    if()
+    const date = new Date()
+    if(new Date(dt.getTime() + 86400000).getDate() === 1) {
+        try {
+            updateTuition(req.teacher, date)
+        }catch(err) {
+            console.log(err)
+            return res.json({status:'fail', msg:err.message})
+        }
+    } else {
+        return res.json({status:'fail', msg:'chua den cuoi thang'})
+    }
 }
 
 // ------------------------------------------- hom thu ----------------------------------------
@@ -686,8 +696,16 @@ async function updateTuition(teacher, date) {
 
     const month = date.getMonth()
     const year = date.getFullYear()
-    const start = new Date(Date.UTC(year, month, 1))
-    const end = new Date(Date.UTC(year, month + 1, 1))
+    let start, end
+    if(month==0) {
+        start = new Date(Date.UTC(year, month, 1))
+        end = new Date(Date.UTC(year, month + 1, 1))
+
+    } else {
+        start = new Date(Date.UTC(year, month-1, 1))
+        end = new Date(Date.UTC(year, month, 1))
+    }
+    
 
     try {
         allStudentTuitions = await LogBook.aggregate([
