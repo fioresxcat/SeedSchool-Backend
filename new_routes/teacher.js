@@ -60,15 +60,16 @@ router.delete('/api/teacher/deleteactivity', checkTeacherRole, teacherController
 
 // ------------------------------------- hoc phi ----------------------------
 // xem hoc phi theo thang
-// router.get('/api/teacher/gettuition', checkTeacherRole, teacherController.getTuition)
-// 
+router.get('/api/teacher/tuition', checkTeacherRole, teacherController.getTuitions)
 
+// cap nhat trang thai dong hoc phi
+router.post('/api/teacher/tuition', checkTeacherRole, teacherController.updateTuitionPaid)
 
 
 // ----------------------------------------- hom thu -------------------------------
-// // xem tat ca thu
-// router.get('/api/teacher/mail', checkTeacherRole, teacherController.getAllMail)
-// // xem chi tiet mot thu
-// router.get('/api/teacher/mail/:id', checkTeacherRole, teacherController.getDetailMail)
+// xem tat ca thu
+router.get('/api/teacher/mail', checkTeacherRole, teacherController.getAllMail)
+// xem chi tiet mot thu
+router.get('/api/teacher/mail/:id', checkTeacherRole, teacherController.getDetailMail)
 
 module.exports = router

@@ -5,7 +5,8 @@ const Schema = mongoose.Schema;
 const teacherSchema = new Schema({
     username: {
         type: String,
-        required: true
+        required: true,
+        unique:true
     },
     password: {
         type: String,
@@ -38,13 +39,14 @@ const teacherSchema = new Schema({
     //     required: true,
     //     ref: "class"
     // },
-    class: {
+    className: {
         type: String,
         required: true,
         unique: true
     },
     numStudent: {
-        type: Number
+        type: Number,
+        default: 0
     }
 }, {
     collection: "teachers"

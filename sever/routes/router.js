@@ -29,7 +29,8 @@ router.post('/api/admin/activities',check.checkAdmin, activity.create);
 router.get('/api/admin/activities', activity.find);
 router.post('/api/admin/activities/find', activity.findDate)
 router.put('/api/admin/activities/:id', activity.update);
-router.delete('/api/admin/activities/:id',check.checkAdmin, activity.delete);
+router.delete('/api/admin/activities/:id',check.checkAdmin, activity.delete)
+router.post('/api/admin/activities/sendnoti/:id', check.checkAdmin, activity.sendNoti)
 
 //FoodMenu7
 router.post('/api/admin/foodmenu', foodmenu.create);

@@ -20,9 +20,22 @@ const parentMailSchema = new Schema({
     content: {
         type: String,
         required: true
-    }    
+    },
+    category: {
+        type: String,
+        enum: ["học phí", "hoạt động chung"],
+        required: true
+    },
+    registered: {
+        type: Boolean,
+        default: false
+    },
+    commonActivity: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'activity'
+    }
 }, {
     collection: "parentMails"
-}) 
-module.exports = mongoose.model("parentMail",parentMailSchema);
+})
+module.exports = mongoose.model("parentMail", parentMailSchema);
 
