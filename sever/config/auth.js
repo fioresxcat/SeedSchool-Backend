@@ -7,14 +7,39 @@ const Parent = require('../../models/parent')
 const Admin = require('../../models/admin')
 
 
+exports.checkAuth = async (req, res, next) => {
+	try {
+        const authHeader = req.header('Authorization')
+	    const token = authHeader && authHeader.split(' ')[1]
+		const idUser = jwt.verify(token,'mk')
+        await Admin.findOne({idUser})
+        .then((data)=>{
+            if(data){
+                res.json({success: true,message:'Bạn đã đăng nhập', token:token})
+            }else{
+               next()
+            }
+        }) 
+	} catch (error) {
+		next()
+	}
+}
+
 exports.checkLogin = async (req, res, next) => {
 	try {
         const authHeader = req.header('Authorization')
 	    const token = authHeader && authHeader.split(' ')[1]
-		const iidUser = jwt.verify(token,'longphu')
-        res.json({success: false,message:'Ban da dang nhap'})   
+		const idUser = jwt.verify(token,'mk')
+        await Admin.findOne({idUser})
+        .then((data)=>{
+            if(data){
+                res.json({success: true,message:'Bạn đã đăng nhập', token:token})
+            }else{
+                res.json({success: false,message:'Chưa đăng nhập'})
+            }
+        }) 
 	} catch (error) {
-		next()
+		res.json({success: false,message:"Chưa đăng nhập"})
 	}
 }
 
@@ -44,7 +69,7 @@ exports.checkAdmin =  (req, res, next) => {
     try{
         const authHeader = req.header('Authorization')
 	    const token = authHeader && authHeader.split(' ')[1]
-        const idUser = jwt.verify(token,'longphu')
+        const idUser = jwt.verify(token,'mk')
         Admin.findOne({
             idUser
         })
