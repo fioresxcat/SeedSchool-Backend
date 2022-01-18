@@ -440,12 +440,21 @@ const getSchedule = async (req, res) => {
 
 // thêm hoạt động thời khóa biểu
 const addActivitySchedule = async (req, res) => {
-    const { scheduleId, newActivity } = req.body
+    const { scheduleId, date, newActivity } = req.body
+    const start = newActivity.start
+    const end = newActivity.end
+    const year = parseInt(date.split('-')[0])
+    const month = parseInt(date.split('-')[1])
+    const day = parseInt(date.split('-')[2])
+    const timestart = new Date(Date.UTC(year, month, day, start.split('-')[0], start.split('-')[1]))
+    const timeend = new Date(Date.UTC(year, month, day, end.split('-')[0], end.split('-')[1]))
+    newActivity.start = timestart
+    newActivity.end = timeend
     try {
         const schedule = await Schedule.findById(scheduleId)
         if (schedule) {
             for (const activity of schedule) {
-                if ((activity.start < new Date(newActivity.start) && new Date(newActivity.start) < activity.end) || (activity.start < new Date(newActivity.end) && new Date(newActivity.end) < activity.end)) {
+                if ((activity.start < newActivity.start && newActivity.start < activity.end) || (activity.start < newActivity.end && newActivity.end < activity.end)) {
                     return res.json({ status: 'fail', msg: 'time overlap with another activity' })
                 }
             }
@@ -471,11 +480,11 @@ const addActivitySchedule = async (req, res) => {
 // sua hoat dong thoi khoa bieu
 const editActivitySchedule = async (req, res) => {
     const scheduleId = req.params.id
-    const { editedSchedule, index } = req.body
+    const { editedActivity, index } = req.body
     try {
         let schedule = await Schedule.findById(scheduleId)
         if (schedule) {
-            schedule.activityList[index] = editedSchedule
+            schedule.activityList[index] = editedActivity
             schedule.save((err, doc) => {
                 if (err) {
                     console.log(err)
@@ -496,12 +505,13 @@ const editActivitySchedule = async (req, res) => {
 
 // xoa hoat dong tkb
 const deleteActivitySchedule = async (req, res) => {
-    const scheduleId = req.params.id
-    const index = req.body.index
+    const scheduleId = req.body.scheduleId
+    const activityId = req.body.activityId
     try {
         let schedule = await Schedule.findById(scheduleId)
         if (schedule) {
-            schedule.activityList.splice(index, 1)
+            // schedule.activityList.splice(index, 1)
+            schedule.activityList = schedule.activityList.filter(element => element._id != activityId)
             schedule.save((err, doc) => {
                 if (err) {
                     console.log(err)
