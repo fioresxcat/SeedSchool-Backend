@@ -318,18 +318,12 @@ const editLogBook = async (req, res) => {
         lookAfterLate2 = 1
     }
 
-    const date = new Date()
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    const day = date.getDate()
-
     let logBook
     try {
         logBook = await LogBook.findById(req.params.id)
         if (logBook) {
             logBook.attendancePicture = attendancePicture
             logBook.comment = comment
-            logBook.date= new Date(Date.UTC(year, month, day))
             logBook.lookAfterLate1= lookAfterLate1
             logBook.lookAfterLate2= lookAfterLate2
             logBook.lateForSchool1= lateForSchool1
