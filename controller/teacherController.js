@@ -593,7 +593,7 @@ const getTuitions = async (req, res) => {
 }
 
 
-module.exports.updateCurrentTuition = async (req, res) => {
+const updateCurrentTuition = async (req, res) => {
     const date = new Date()
     if(new Date(dt.getTime() + 86400000).getDate() === 1) {
         try {
@@ -790,3 +790,4 @@ module.exports.getAllMail = getAllMail
 module.exports.getDetailMail = getDetailMail
 module.exports.updateTuitionPaid = updateTuitionPaid
 module.exports.getLogBook = getLogBook
+module.exports.updateCurrentTuition = updateCurrentTuition
