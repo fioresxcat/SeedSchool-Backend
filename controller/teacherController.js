@@ -51,7 +51,7 @@ const login = async (req, res) => {
 // get all students
 const getStudents = async (req, res) => {
     try {
-        const students = await Student.find({ teacher: req.teacher._id }).sort({ name: 1 })
+        const students = await Student.find({ teacher: req.teacher._id }).populate('parent').sort({ name: 1 })
         if (students.length) {
             return res.json({ status: 'ok', msg: 'get students ok', students: students })
         } else {
@@ -68,7 +68,8 @@ const getStudents = async (req, res) => {
 // get student with id param
 const getStudent = async (req, res) => {
     try {
-        const student = await Student.findById(req.params.id)
+        
+        const student = await Student.findById(req.params.id).populate('parent')
         if (student) {
             return res.json({ status: 'ok', msg: 'get student ok', student: student })
         } else {
