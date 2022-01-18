@@ -148,7 +148,7 @@ exports.sendNoti = async (req, res) => {
                 parent: parent,
                 title: title,
                 content: content,
-                category: "hoạt động chung",
+                category: "Hoạt động chung",
                 commonActivity: activity
             })
             mail.save((err, doc) => {
