@@ -151,7 +151,7 @@ const getTuition = async (req, res) => {
         try {
             const student = await Student.findOne({ parent: req.parent._id })
             if (student) {
-                const tuitions = await Tuition.find({ student: student._id }).sort({ date: 1 }).limit(10)
+                const tuitions = await Tuition.find({ student: student._id }).populate('student').sort({ date: 1 }).limit(10)
                 if (tuitions) {
                     return res.json({ status: 'ok', msg: 'get tuition ok', tuitions: tuitions })
                 } else {
@@ -173,7 +173,7 @@ const getTuition = async (req, res) => {
         try {
             const student = await Student.findOne({ parent: req.parent._id })
             if (student) {
-                const tuitions = await Tuition.find({ student: student, date: date })
+                const tuitions = await Tuition.find({ student: student, date: date }).populate('student')
                 if (tuitions.length) {
                     return res.json({ status: 'ok', msg: 'get tuition with month ok', tuitions: tuitions })
                 } else {
