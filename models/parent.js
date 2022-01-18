@@ -15,7 +15,8 @@ const parentSchema = new Schema({
     role: {
         type: String,
         enum: ['parent'],
-        required: true
+        required: true,
+        default: 'parent'
     },
     name: {
         type: String,

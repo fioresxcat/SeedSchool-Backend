@@ -44,5 +44,6 @@ router.put('/api/admin/foodmenu/:id', check.checkAdmin,foodmenu.update);
 router.delete('/api/admin/foodmenu/:id',check.checkAdmin, foodmenu.delete);
 
 
+
 module.exports = router;
 
