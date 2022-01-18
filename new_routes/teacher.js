@@ -38,9 +38,12 @@ router.delete('/api/teacher/student/:id', checkTeacherRole, teacherController.de
 //ok
 router.get('/api/teacher/logbook', checkTeacherRole, teacherController.getLogBooks)
 
+// xem so theo doi theo id
+router.get('/api/teacher/logbook/:id', checkTeacherRole, teacherController.getLogBook)
+
 // sua so theo doi (1 hoc sinh + 1 ngay)
 //ok
-router.put('/api/teacher/logbook', checkTeacherRole, teacherController.editLogBook)
+router.put('/api/teacher/logbook/:id', checkTeacherRole, teacherController.editLogBook)
 
 // them so theo doi (1 hoc sinh + 1 ngay)
 //ok

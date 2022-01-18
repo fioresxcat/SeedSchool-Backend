@@ -273,12 +273,24 @@ const getLogBooks = async (req, res) => {
             }
         } catch (err) {
             console.log(err)
-            return res.json({ status: 'fail', msg: eerr.message })
+            return res.json({ status: 'fail', msg: err.message })
         }
     }
 }
 
-
+const getLogBook = async (req, res) => {
+    try {
+        const logBook = await LogBook.findById(req.params.id)
+        if(logBook) {
+            return res.json({status:'ok', msg:'get single logbook ok', logBook: logBook})
+        } else {
+            return res.json({status:'fail', msg:'cannot get logbook with this id'})
+        }
+    } catch(err) {
+        console.log(err)
+        return res.json({ status: 'fail', msg: err.message })
+    }
+}
 
 const editLogBook = async (req, res) => {
     const { student, date } = req.query
@@ -691,3 +703,4 @@ module.exports.sendTuitionNoti = sendTuitionNoti
 module.exports.getAllMail = getAllMail
 module.exports.getDetailMail = getDetailMail
 module.exports.updateTuitionPaid = updateTuitionPaid
+module.exports.getLogBook = getLogBook
