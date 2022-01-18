@@ -68,7 +68,7 @@ const getStudents = async (req, res) => {
 // get student with id param
 const getStudent = async (req, res) => {
     try {
-        
+
         const student = await Student.findById(req.params.id).populate('parent')
         if (student) {
             return res.json({ status: 'ok', msg: 'get student ok', student: student })
@@ -130,7 +130,7 @@ const addStudent = async (req, res) => {
         }
     } catch (err) {
         console.log(err)
-        return res.json({ status: 'fail', msg: 'cannot save new parent' })
+        return res.json({ status: 'fail', msg: err.message })
     }
 }
 
@@ -162,16 +162,16 @@ const editStudent = async (req, res) => {
             student.parent.address = pAddress
 
             student.parent.save((err, doc) => {
-                if(err) {
+                if (err) {
                     console.log(err)
-                    return res.json({status:'fail', msg: err.message})
+                    return res.json({ status: 'fail', msg: err.message })
                 } else {
                     student.save((err, doc) => {
-                        if(err) {
+                        if (err) {
                             console.log(err)
-                            return res.json({status:'fail', msg: err.message})
+                            return res.json({ status: 'fail', msg: err.message })
                         } else {
-                            return res.json({status:'ok', msg:'edit student ok', student: doc})
+                            return res.json({ status: 'ok', msg: 'edit student ok', student: doc })
                         }
                     })
                 }
@@ -181,10 +181,10 @@ const editStudent = async (req, res) => {
         }
     } catch (err) {
         if (student != null) { // nếu bị lỗi đoạn await student.save()
-            return res.json({ status: 'fail', msg: 'cannot edit student with this is' })
+            return res.json({ status: 'fail', msg: err.message })
         } else {
             console.log('Server error edit student with id: ' + err)
-            return res.json({ status: 'fail', msg: 'Server error edit student with id' })
+            return res.json({ status: 'fail', msg: err.message })
         }
     }
 }
@@ -310,16 +310,40 @@ const editLogBook = async (req, res) => {
 
 // add a new logbook
 const addLogBook = async (req, res) => {
-    const { student, date, attendancePicture, schedule, comment, lookAfterLate, lateForSchool } = req.body
+    const { student, attendancePicture, comment, status, lookAfterLate } = req.body.logbook
+    let lookAfterLate1, lookAfterLate2, lateForSchool1, lateForSchool2
+
+    if (status == "Đi học") {
+        lateForSchool1 = 0
+        lateForSchool2 = 0
+    } else if (status == "Nghỉ học") {
+        lateForSchool1 = 1
+        lateForSchool2 = 0
+    } else if (status == "Nghỉ không phép") {
+        lateForSchool1 = 0
+        lateForSchool2 = 1
+    }
+
+    if (lookAfterLate == "Không") {
+        lookAfterLate1 = 0
+        lookAfterLate2 = 0
+    } else if (lookAfterLate == "5h30-6h30") {
+        lookAfterLate1 = 1
+        lookAfterLate2 = 0
+    } else if (lookAfterLate == "Sau 6h30") {
+        lookAfterLate1 = 0
+        lookAfterLate2 = 1
+    }
+
     let logBook = new LogBook({
         student: student,
-        teacher: teacher,
-        date: new Date(date),
+        teacher: req.teacher,
         attendancePicture: attendancePicture,
-        schedule: schedule,
         comment: comment,
-        lookAfterLate: lookAfterLate,
-        lateForSchool: lateForSchool
+        lookAfterLate1: lookAfterLate1,
+        lookAfterLate2: lookAfterLate2,
+        lateForSchool1: lateForSchool1,
+        lateForSchool2: lateForSchool2,
     })
 
     try {
@@ -370,8 +394,8 @@ const addActivitySchedule = async (req, res) => {
         const schedule = await Schedule.findById(scheduleId)
         if (schedule) {
             for (const activity of schedule) {
-                if((activity.start < new Date(newActivity.start) && new Date(newActivity.start) < activity.end) || (activity.start < new Date(newActivity.end) && new Date(newActivity.end) < activity.end)) {
-                    return res.json({status:'fail', msg:'time overlap with another activity'})
+                if ((activity.start < new Date(newActivity.start) && new Date(newActivity.start) < activity.end) || (activity.start < new Date(newActivity.end) && new Date(newActivity.end) < activity.end)) {
+                    return res.json({ status: 'fail', msg: 'time overlap with another activity' })
                 }
             }
             schedule.activityList.push(newActivity)
@@ -466,7 +490,7 @@ const getTuitions = async (req, res) => {
         const month = parseInt(time.split('-')[1])
         const year = parseInt(time.split('-')[0])
         const start = `${year}-${month}-01`
-        const end = `${year}-${month+1}-01`
+        const end = `${year}-${month + 1}-01`
 
         try {
             const tuitions = await Tuition.find({
@@ -560,13 +584,13 @@ const sendTuitionNoti = async (req, res) => {
 const updateTuitionPaid = async (req, res) => {
     for (const id of req.body.tuitionId) {
         try {
-            let tuition = await Tuition.findOneAndUpdate({_id: id}, {paid:"Đã nộp"}, {new:true})
-        } catch(err) {
+            let tuition = await Tuition.findOneAndUpdate({ _id: id }, { paid: "Đã nộp" }, { new: true })
+        } catch (err) {
             console.log(err)
-            return res.json({status:'fail', msg:'cannot update tuition paid'})
+            return res.json({ status: 'fail', msg: 'cannot update tuition paid' })
         }
     }
-    return res.json({status:'ok', msg:'update tuition paid ok'})
+    return res.json({ status: 'ok', msg: 'update tuition paid ok' })
 }
 
 

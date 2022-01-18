@@ -16,11 +16,11 @@ const logBookSchema = new Schema({
     },
     date: {
         type: Date,
-        required: true
+        required: true,
+        default: convertDateToUTC(Date.now())
     },
     attendancePicture: {
-        type: String,   
-        required: true        
+        type: String,
     },
     // schedule: {
     //     type: mongoose.SchemaTypes.ObjectId,
@@ -28,26 +28,26 @@ const logBookSchema = new Schema({
     //     ref:'schedule'
     // },
     comment: {
-        type: String, 
+        type: String,
     },
-    lookAfterLate1: { 
+    lookAfterLate1: {
         type: Number,
-        enum: [0,1], // 
+        enum: [0, 1], // 
         // required: true
     },
-    lookAfterLate2: { 
+    lookAfterLate2: {
         type: Number,
-        enum: [0,1], // 
+        enum: [0, 1], // 
         // required: true
     },
     lateForSchool1: {
         type: Number,
-        enum: [0,1],   
+        enum: [0, 1],
         // required: true
     },
     lateForSchool2: {
         type: Number,
-        enum: [0,1],   
+        enum: [0, 1],
         // required: true
     }
 }, {
@@ -61,8 +61,10 @@ logBookSchema.virtual('schedule', {
     justOne: true
 })
 
-module.exports = mongoose.model("logBook",logBookSchema);
+module.exports = mongoose.model("logBook", logBookSchema);
 
 //các thao tác
 // + thêm logbook cho ngày mới
 // + sửa logbook
+
+function convertDateToUTC(date) { return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); }
