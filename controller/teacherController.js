@@ -570,13 +570,16 @@ const getTuitions = async (req, res) => {
         const year = parseInt(time.split('-')[0])
         const start = `${year}-${month}-01`
         const end = `${year}-${month + 1}-01`
-
+        console.log(month, year)
+        console.log(start)
+        console.log(end)
+        
         try {
             const tuitions = await Tuition.find({
                 teacher: req.teacher,
                 date: { $gte: new Date(start), $lt: new Date(end) }
             })
-            if (tuitions) {
+            if (tuitions.length) {
                 return res.json({ status: 'ok', msg: 'get tuitions with date ok', tuitions: tuitions })
             } else {
                 return res.json({ status: 'fail', msg: 'no tuitions in database' })
@@ -589,6 +592,10 @@ const getTuitions = async (req, res) => {
 
 }
 
+
+module.exports.updateCurrentTuition = async (req, res) => {
+    if()
+}
 
 // ------------------------------------------- hom thu ----------------------------------------
 // xem tat ca mail

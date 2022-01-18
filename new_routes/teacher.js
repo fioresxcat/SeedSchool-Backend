@@ -66,8 +66,9 @@ router.delete('/api/teacher/activity/:id', checkTeacherRole, teacherController.d
 router.get('/api/teacher/tuition', checkTeacherRole, teacherController.getTuitions)
 
 // cap nhat trang thai dong hoc phi
-router.post('/api/teacher/tuition', checkTeacherRole, teacherController.updateTuitionPaid)
-
+// router.post('/api/teacher/tuition', checkTeacherRole, teacherController.updateTuitionPaid)
+// cap nhat hoc phi thang hien tai
+router.get('/api/teacher/tuition/update', checkTeacherRole, teacherController.updateCurrentTuition)
 
 // ----------------------------------------- hom thu -------------------------------
 // xem tat ca thu
