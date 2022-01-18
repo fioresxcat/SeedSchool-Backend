@@ -32,6 +32,7 @@ router.post('/api/admin/activities/find', activity.findDate)
 router.put('/api/admin/activities/:id', activity.update);
 router.delete('/api/admin/activities/:id', activity.delete);
 router.get('/api/admin/activities/:id', activity.find);
+router.post('/api/admin/activities/sendnoti', check.checkAdmin, activity.sendNoti)
 
 //FoodMenu7
 router.post('/api/admin/foodmenu/add', foodmenu.create);
@@ -40,6 +41,7 @@ router.get('/api/admin/foodmenu/:id', foodmenu.find);
 router.post('/api/admin/foodmenu/find', foodmenu.findDate)
 router.put('/api/admin/foodmenu/:id', foodmenu.update);
 router.delete('/api/admin/foodmenu/:id', foodmenu.delete);
+
 
 
 module.exports = router;
