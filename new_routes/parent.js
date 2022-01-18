@@ -42,4 +42,7 @@ router.get('/api/parent/mail/:id', checkParentRole, parentController.getDetailMa
 // return: mail: mail da gui
 router.post('/api/parent/mail', checkParentRole, parentController.postMail)
 
+// dang ki tham gia hoat dong chung
+router.post('/api/parent/mail/register/:id', checkParentRole, parentController.registerCommonActivity)
+
 module.exports = router

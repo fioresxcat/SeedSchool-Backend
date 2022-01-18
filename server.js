@@ -13,7 +13,6 @@ const cors = require('cors')
 
 const parentRouter = require('./new_routes/parent')
 const teacherRouter = require('./new_routes/teacher')
-const indexRouter = require('./routes/index')
 
 const app = express()
 
@@ -47,7 +46,6 @@ app.use(methodOverride('_method'))
 app.use(cookieParser())
 
 // routes
-app.use(indexRouter)
 app.use(parentRouter, function(req,res,next){
     next()
 })

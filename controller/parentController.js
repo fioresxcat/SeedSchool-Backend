@@ -65,7 +65,7 @@ const getDetailStudent = async (req, res, next) => {
     }
 }
 
-
+// ---------------------------------------------- so theo doi ---------------------------------------------
 const getLogBook = async (req, res) => {
     if (!req.query.date) {
         try {
@@ -73,12 +73,12 @@ const getLogBook = async (req, res) => {
             if (student) {
                 const logBooks = await LogBook.find({ student: student._id }).populate('schedule').populate('student').sort({ date: 1 }).limit(10)
                 if (logBooks) {
-                    let schedules = []
-                    for (const logBook of logBooks) {
-                        console.log(logBook.schedule)
-                        schedules.push(logBook.schedule)
-                    }
-                    return res.json({ status: 'ok', msg: 'get logbook ok', logBooks: logBooks, schedules: schedules })
+                    // let schedules = []
+                    // for (const logBook of logBooks) {
+                    //     console.log(logBook.schedule)
+                    //     schedules.push(logBook.schedule)
+                    // }
+                    return res.json({ status: 'ok', msg: 'get logbook ok', logBooks: logBooks })
                 } else {
                     return res.json({ status: 'fail', msg: 'cannot find logbook with this student' })
                 }
@@ -118,14 +118,14 @@ const getSchedule = async (req, res) => {
         try {
             const student = await Student.findOne({ parent: req.parent })
             const schedule = await Schedule.find({ student: student }).sort({ date: -1 }).limit(1)
-            if (schedule) {
-                return res.json({ status: 'ok', msg: 'get lastest schedule ok', schedule: schedule })
+            if (schedule.length) {
+                return res.json({ status: 'ok', msg: 'get lastest schedule ok', schedule: schedule[0] })
             } else {
                 return res.json({ status: 'fail', msg: 'cannot find schedule', schedule: schedule })
             }
         } catch (err) {
             console.log(err)
-            return res.json({status:'ok', msg:err.message})
+            return res.json({ status: 'ok', msg: err.message })
         }
     } else {
         try {
@@ -136,12 +136,13 @@ const getSchedule = async (req, res) => {
             } else {
                 return res.json({ status: 'fail', msg: 'cannot find schedule', schedule: schedule })
             }
-        } catch(err) {
+        } catch (err) {
             console.log(err)
-            return res.json({status:'ok', msg:err.message})
+            return res.json({ status: 'ok', msg: err.message })
         }
     }
 }
+
 // ------------------------------------- hoc phi ---------------------------------------------
 
 const getTuition = async (req, res) => {
@@ -150,7 +151,7 @@ const getTuition = async (req, res) => {
         try {
             const student = await Student.findOne({ parent: req.parent._id })
             if (student) {
-                const tuitions = await Tuition.find({ student: student._id }).sort({ date: 1 }).limit(10)
+                const tuitions = await Tuition.find({ student: student._id }).populate('student').sort({ date: 1 }).limit(10)
                 if (tuitions) {
                     return res.json({ status: 'ok', msg: 'get tuition ok', tuitions: tuitions })
                 } else {
@@ -172,7 +173,7 @@ const getTuition = async (req, res) => {
         try {
             const student = await Student.findOne({ parent: req.parent._id })
             if (student) {
-                const tuitions = await Tuition.find({ student: student, date: date })
+                const tuitions = await Tuition.find({ student: student, date: date }).populate('student')
                 if (tuitions.length) {
                     return res.json({ status: 'ok', msg: 'get tuition with month ok', tuitions: tuitions })
                 } else {
@@ -254,6 +255,43 @@ const postMail = async (req, res) => {
     }
 }
 
+// dang ky tham gia hoat dong
+const registerCommonActivity = async (req, res) => {
+    // cap nhat parentMail
+    try {
+        let mail = await ParentMail.findById(req.params.id).populate('commonActivity')
+        if (mail) {
+            if (mail.registered == false) {
+                mail.registered = true // sua thanh da dang ki
+                mail.commonActivity.registerList.push(req.parent) // them phu huynh vao danh sach da dang ki
+                mail.commonActivity.save((err, doc) => {
+                    if (err) {
+                        console.log(err)
+                        return res.json({ status: 'fail', msg: 'error saving common activity' })
+                    } else {
+                        mail.save((err, doc) => {
+                            if (err) {
+                                console.log(err)
+                                return res.json({ status: 'fail', msg: 'error registering hoat dong' })
+                            } else {
+                                return res.json({ status: 'ok', msg: 'dang ki hoat dong ok', mail: doc })
+                            }
+                        })
+                    }
+                })
+            } else {
+                return res.json({status:'fail', msg:'ban da dang ki hoat dong nay'})
+            }
+        } else {
+            return res.json({ status: 'fail', msg: 'cannot find mail with this id' })
+        }
+    } catch (err) {
+        console.log(err)
+        return res.json({ status: 'fail', msg: err.message })
+    }
+
+}
+
 
 
 module.exports.login = login
@@ -264,3 +302,4 @@ module.exports.getAllMail = getAllMail
 module.exports.getDetailMail = getDetailMail
 module.exports.getSchedule = getSchedule
 module.exports.postMail = postMail
+module.exports.registerCommonActivity = registerCommonActivity

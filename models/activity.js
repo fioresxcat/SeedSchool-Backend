@@ -24,6 +24,11 @@ const UserSchema = new mongoose.Schema({
   timeFinish:{
     type: String,
     required: true
+  },
+  registerList: {
+    type: [mongoose.SchemaTypes.ObjectId],
+    ref: 'parent',
+    default:[]
   }
 });
 

@@ -33,22 +33,22 @@ const logBookSchema = new Schema({
     lookAfterLate1: { 
         type: Number,
         enum: [0,1], // 
-        required: true
+        // required: true
     },
     lookAfterLate2: { 
         type: Number,
         enum: [0,1], // 
-        required: true
+        // required: true
     },
     lateForSchool1: {
         type: Number,
         enum: [0,1],   
-        required: true
+        // required: true
     },
     lateForSchool2: {
         type: Number,
         enum: [0,1],   
-        required: true
+        // required: true
     }
 }, {
     collection: "logBooks"

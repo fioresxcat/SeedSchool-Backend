@@ -37,6 +37,11 @@ const tuitionSchema = new Schema({
     late2: {
         type: Number,
         required: true
+    },
+    paid: {
+        type: String,
+        enum: ["Đã nộp", "Chưa nộp"],
+        default: "Chưa nộp"
     }
 }, {                               
     collection: "tuitions"

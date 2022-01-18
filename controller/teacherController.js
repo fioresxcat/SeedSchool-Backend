@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken')
 
 
 const login = async (req, res) => {
-    if (req.headers.authorization.split(' ')[1] === 'undefined') {
+    if (req.body || req.headers.authorization.split(' ')[1] === 'undefined') {
         console.log('Dang nhap khong co authorization')
         const username = req.body.username
         const password = req.body.password
@@ -19,7 +19,7 @@ const login = async (req, res) => {
             const teacher = await Teacher.findOne({ username: username, password: password }) // tìm trong csdl xem có tk hợp lệ không
             if (teacher) {
                 const token = jwt.sign({ _id: teacher._id }, 'mk') // mã hóa id của người dùng dưới dạng 1 chuỗi jwt
-                return res.json({ status: 'success', token: token, teacher: teacher })
+                return res.json({ status: 'ok', token: token, teacher: teacher })
             } else {
                 console.log('teacher not found')
                 return res.json({ status: 'fail', msg: 'teacher not found' })
@@ -37,7 +37,7 @@ const login = async (req, res) => {
                     Teacher.findById(result._id, (err, result) => {
                         if (err) return res.json({ status: 'fail', msg: 'server error' })
                         else if (result) {
-                            return res.json({ status: 'success', teacher: result, msg: 'login successfully', token: token })
+                            return res.json({ status: 'ok', teacher: result, msg: 'login ok', token: token })
                         }
                     })
                 }
@@ -119,6 +119,7 @@ const addStudent = async (req, res) => {
                 if (err) {
                     return res.json({ status: 'fail', msg: 'cannot save new student' })
                 } else {
+                    req.teacher.numStudent += 1
                     return res.json({ status: 'ok', msg: 'save new student ok', student: newStudent })
                 }
             })
@@ -355,6 +356,11 @@ const addActivitySchedule = async (req, res) => {
     try {
         const schedule = await Schedule.findById(scheduleId)
         if (schedule) {
+            for (const activity of schedule) {
+                if((activity.start < new Date(newActivity.start) && new Date(newActivity.start) < activity.end) || (activity.start < new Date(newActivity.end) && new Date(newActivity.end) < activity.end) {
+                    return res.json({status:'fail', msg:'time overlap with another activity'})
+                }
+            }
             schedule.activityList.push(newActivity)
             schedule.save((err, rs) => {
                 if (err) {
@@ -523,7 +529,8 @@ const sendTuitionNoti = async (req, res) => {
                 let mail = new ParentMail({
                     parent: tuition.student.parent,
                     title: 'Thông báo học phí',
-                    content: content
+                    content: content,
+                    category: "học phí"
                 })
                 await mail.save()
             }
@@ -535,6 +542,20 @@ const sendTuitionNoti = async (req, res) => {
         return res.json({ status: 'fail', msg: err.message })
     }
 }
+
+
+const updateTuitionPaid = async (req, res) => {
+    for (const id of req.body.tuitionId) {
+        try {
+            let tuition = await Tuition.findOneAndUpdate({_id: id}, {paid:"Đã nộp"}, {new:true})
+        } catch(err) {
+            console.log(err)
+            return res.json({status:'fail', msg:'cannot update tuition paid'})
+        }
+    }
+    return res.json({status:'ok', msg:'update tuition paid ok'})
+}
+
 
 // ---------------------------------------- ultility functions ----------------------------------------
 async function updateTuition(teacher, date) {
@@ -622,3 +643,6 @@ module.exports.editActivitySchedule = editActivitySchedule
 module.exports.deleteActivitySchedule = deleteActivitySchedule
 module.exports.getTuitions = getTuitions
 module.exports.sendTuitionNoti = sendTuitionNoti
+module.exports.getAllMail = getAllMail
+module.exports.getDetailMail = getDetailMail
+module.exports.updateTuitionPaid = updateTuitionPaid

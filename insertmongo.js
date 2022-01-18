@@ -45,16 +45,16 @@ const student = new Student({
 
 
 const teacher = new Teacher({
-    username: 'longnd',
-    password: '20194100',
+    username: 'anhdt',
+    password: '20194219',
     role: 'teacher',
-    name: "nguyen duc long",
-    birth: new Date(Date.UTC(2001, 9, 6)),
+    name: "dinh tuan anh",
+    birth: new Date(Date.UTC(2001, 8, 24)),
     sex: "Nam",
-    phoneNumber: "0123456789",
-    class: '1B'
+    phoneNumber: "0852252482",
+    className: '1A'
 })
-//save(teacher)
+save(teacher)
 
 // const activitySchedule = new ActivitySchedule({
 //     teacher: '61ca8c2b5877b1ca3bbad3d1',
@@ -146,73 +146,73 @@ async function save(entity) {
 //     }
 // })
 
-updateTuition('61e5225a387ce5e62d91ebe1', new Date(Date.UTC(2022, 0, 31)))
-async function updateTuition(teacher, date) {
-    let allStudentTuitions
+// updateTuition('61e5225a387ce5e62d91ebe1', new Date(Date.UTC(2022, 0, 31)))
+// async function updateTuition(teacher, date) {
+//     let allStudentTuitions
 
-    const month = date.getMonth()
-    const year = date.getFullYear()
-    const start = new Date(Date.UTC(year, month, 1))
-    const end = new Date(Date.UTC(year, month+1, 1))
+//     const month = date.getMonth()
+//     const year = date.getFullYear()
+//     const start = new Date(Date.UTC(year, month, 1))
+//     const end = new Date(Date.UTC(year, month+1, 1))
 
-    try {
-        allStudentTuitions = await LogBook.aggregate([
-            {
-                $match: {
-                    "teacher": mongoose.Types.ObjectId(teacher),
-                    "date": {$gte: start, $lt: end} 
-                }
-            },
-            {
-                $group: {
-                    _id: '$student',
-                    total_lookafter_late_1: {
-                        $sum: "$lookAfterLate1"
-                    },
-                    total_lookafter_late_2: {
-                        $sum: "$lookAfterLate2"
-                    },
-                    total_valid_absence: {
-                        $sum: "$lateForSchool1"
-                    },
-                    total_invalid_absence: {
-                        $sum: "$lateForSchool2"
-                    }
-                }
-            }
+//     try {
+//         allStudentTuitions = await LogBook.aggregate([
+//             {
+//                 $match: {
+//                     "teacher": mongoose.Types.ObjectId(teacher),
+//                     "date": {$gte: start, $lt: end} 
+//                 }
+//             },
+//             {
+//                 $group: {
+//                     _id: '$student',
+//                     total_lookafter_late_1: {
+//                         $sum: "$lookAfterLate1"
+//                     },
+//                     total_lookafter_late_2: {
+//                         $sum: "$lookAfterLate2"
+//                     },
+//                     total_valid_absence: {
+//                         $sum: "$lateForSchool1"
+//                     },
+//                     total_invalid_absence: {
+//                         $sum: "$lateForSchool2"
+//                     }
+//                 }
+//             }
 
-        ])
-        console.log(allStudentTuitions)
+//         ])
+//         console.log(allStudentTuitions)
 
-        // sử dụng thằng ở trên để uppdate vào tuition database
-        for (const tuition of allStudentTuitions) {
-            saveTuition(tuition, teacher, date)
-        }
+//         // sử dụng thằng ở trên để uppdate vào tuition database
+//         for (const tuition of allStudentTuitions) {
+//             saveTuition(tuition, teacher, date)
+//         }
         
 
-        return allStudentTuitions
-    } catch (err) {
-        console.log(err)
-    }
+//         return allStudentTuitions
+//     } catch (err) {
+//         console.log(err)
+//     }
 
 
-}
+// }
 
-async function saveTuition(tuition, teacher, date) {
-    let newTuition = new Tuition({
-        teacher: teacher,
-        student: tuition._id,
-        date: date,
-        validAbsence: tuition.total_valid_absence,
-        invalidAbsence: tuition.total_invalid_absence,
-        late1: tuition.total_lookafter_late_1,
-        late2: tuition.total_lookafter_late_2,
-    })
+// async function saveTuition(tuition, teacher, date) {
+//     let newTuition = new Tuition({
+//         teacher: teacher,
+//         student: tuition._id,
+//         date: date,
+//         validAbsence: tuition.total_valid_absence,
+//         invalidAbsence: tuition.total_invalid_absence,
+//         late1: tuition.total_lookafter_late_1,
+//         late2: tuition.total_lookafter_late_2,
+//     })
     
-    try {
-        newTuition.save()
-        console.log('save tuition ok')
-    } catch (err) {
-        console.log('cannot save new tuition')
-    }
-}
+//     try {
+//         newTuition.save()
+//         console.log('save tuition ok')
+//     } catch (err) {
+//         console.log('cannot save new tuition')
+//     }
+// }
