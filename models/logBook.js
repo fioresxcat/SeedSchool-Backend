@@ -17,7 +17,6 @@ const logBookSchema = new Schema({
     date: {
         type: Date,
         required: true,
-        default: new Date()
     },
     attendancePicture: {
         type: String,
