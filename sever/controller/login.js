@@ -25,7 +25,7 @@ exports.loginAdmin = async (req, res) => {
             if (err) return res.json(err)
             if (isMatch){
                 const token = jwt.sign(
-                    {userId: user._id},'longphu')
+                    {userId: user._id},'mk')
                 res.json(
                     {success:true, message: 'Đăng nhập thành công', token})
             }else{
@@ -55,7 +55,7 @@ exports.loginParent = async (req, res) => {
             if (err) return res.json(err)
             if (isMatch){
                 const token = jwt.sign(
-                    {userId: user._id},'longphu')
+                    {userId: user._id},'mk')
                 res.json(
                     {success:true, message: 'Đăng nhập thành công', token})
             }else{
@@ -86,7 +86,7 @@ exports.loginTeacher = async (req, res) => {
             if (err) return res.json(err)
             if (isMatch){
                 const token = jwt.sign(
-                    {userId: user._id},'longphu')
+                    {userId: user._id},'mk')
                 res.json(
                     {success:true, message: 'Đăng nhập thành công', token})
             }else{
