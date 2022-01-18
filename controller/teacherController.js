@@ -293,17 +293,47 @@ const getLogBook = async (req, res) => {
 }
 
 const editLogBook = async (req, res) => {
-    const { student, date } = req.query
-    const { attendancePicture, schedule, comment, lookAfterLate, lateForSchool } = req.body
+    const { attendancePicture, comment, status, lookAfterLate } = req.body.logbook
+    let lookAfterLate1, lookAfterLate2, lateForSchool1, lateForSchool2
+
+    if (status == "Đi học") {
+        lateForSchool1 = 0
+        lateForSchool2 = 0
+    } else if (status == "Nghỉ học") {
+        lateForSchool1 = 1
+        lateForSchool2 = 0
+    } else if (status == "Nghỉ không phép") {
+        lateForSchool1 = 0
+        lateForSchool2 = 1
+    }
+
+    if (lookAfterLate == "Không") {
+        lookAfterLate1 = 0
+        lookAfterLate2 = 0
+    } else if (lookAfterLate == "5h30-6h30") {
+        lookAfterLate1 = 1
+        lookAfterLate2 = 0
+    } else if (lookAfterLate == "Sau 6h30") {
+        lookAfterLate1 = 0
+        lookAfterLate2 = 1
+    }
+
+    const date = new Date()
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const day = date.getDate()
+
     let logBook
     try {
-        logBook = await LogBook.findOne({ teacher: req.teacher, student: student._id, date: new Date(date) })
+        logBook = await LogBook.findById(req.params.id)
         if (logBook) {
             logBook.attendancePicture = attendancePicture
-            logBook.schedule = schedule
             logBook.comment = comment
-            logBook.lookAfterLate = lookAfterLate
-            logBook.lateForSchool = lateForSchool
+            logBook.date= new Date(Date.UTC(year, month, day))
+            logBook.lookAfterLate1= lookAfterLate1
+            logBook.lookAfterLate2= lookAfterLate2
+            logBook.lateForSchool1= lateForSchool1
+            logBook.lateForSchool2= lateForSchool2
 
             await logBook.save()
             return res.json({ status: 'ok', msg: 'edit logbook with student and date ok', logBook: logBook })
