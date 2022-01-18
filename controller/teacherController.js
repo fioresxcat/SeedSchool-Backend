@@ -440,40 +440,54 @@ const getSchedule = async (req, res) => {
 
 // thêm hoạt động thời khóa biểu
 const addActivitySchedule = async (req, res) => {
-    const { scheduleId, date, newActivity } = req.body
+    const { date, newActivity } = req.body
     const start = newActivity.start
     const end = newActivity.end
 
     const year = parseInt(date.split('-')[0])
     const month = parseInt(date.split('-')[1])
     const day = parseInt(date.split('-')[2])
-    
-    const timestart = new Date(Date.UTC(year, month, day, start.split(':')[0], start.split(':')[1]))
-    const timeend = new Date(Date.UTC(year, month, day, end.split(':')[0], end.split(':')[1]))
+
+    const timestart = new Date(Date.UTC(year, month-1, day, start.split(':')[0], start.split(':')[1]))
+    const timeend = new Date(Date.UTC(year, month-1, day, end.split(':')[0], end.split(':')[1]))
     newActivity.start = timestart
     newActivity.end = timeend
     console.log(newActivity.start)
     console.log(newActivity.end)
+
     try {
-        const schedule = await Schedule.findById(scheduleId)
-        if (schedule) {
-            for (const activity of schedule.activityList) {
+        const schedule = await Schedule.find({teacher: req.teacher, date: new Date(Date.UTC(year, month-1, day))})
+        if (schedule.length) {
+            for (const activity of schedule[0].activityList) {
                 if ((activity.start < newActivity.start && newActivity.start < activity.end) || (activity.start < newActivity.end && newActivity.end < activity.end)) {
                     return res.json({ status: 'fail', msg: 'time overlap with another activity' })
                 }
             }
-            schedule.activityList.push(newActivity)
-            schedule.save((err, rs) => {
+            schedule[0].activityList.push(newActivity)
+            schedule[0].save((err, rs) => {
                 if (err) {
                     console.log(err)
                     return res.json({ status: 'fail', msg: 'cannot add activity to schedule' })
                 } else {
-                    return res.json({ status: 'ok', msg: 'add activity to schedule ok', schedule: schedule })
+                    return res.json({ status: 'ok', msg: 'add activity to schedule ok', schedule: rs })
                 }
             })
         } else {
-            console.log(schedule)
-            return res.json({ status: 'fail', msg: 'cannot find schedule to add activity' })
+            // console.log(schedule)
+            // return res.json({ status: 'fail', msg: 'cannot find schedule to add activity' })
+            let newSchedule = new Schedule({
+                teacher: req.teacher,
+                date: new Date(Date.UTC(year, month-1, day)),
+                activityList: [newActivity]
+            })
+            newSchedule.save((err,doc)=> {
+                if(err) {
+                    console.log(err)
+                    return res.json({status:'fail', msg:err.message})
+                } else {
+                    return res.json({status:'ok', msg:'add new schedule and new activity ok', schedule:doc})
+                }
+            })
         }
     } catch (err) {
         console.log(err)
