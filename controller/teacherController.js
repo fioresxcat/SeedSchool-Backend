@@ -335,12 +335,17 @@ const addLogBook = async (req, res) => {
         lookAfterLate2 = 1
     }
 
+    const date = new Date()
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const day = date.getDate()
+
     let logBook = new LogBook({
         student: student,
         teacher: req.teacher,
         attendancePicture: attendancePicture,
         comment: comment,
-        date: convertDateToUTC(new Date()),
+        date: new Date(Date.UTC(year, month, day)),
         lookAfterLate1: lookAfterLate1,
         lookAfterLate2: lookAfterLate2,
         lateForSchool1: lateForSchool1,
@@ -666,7 +671,7 @@ async function saveTuition(tuition, teacher, date) {
     }
 }
 
-function convertDateToUTC(date) { return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); }
+//function convertDateToUTC(date) { return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); }
 
 module.exports.login = login
 module.exports.getStudents = getStudents
