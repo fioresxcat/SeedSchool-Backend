@@ -457,7 +457,7 @@ const addActivitySchedule = async (req, res) => {
     console.log(newActivity.end)
 
     try {
-        const schedule = await Schedule.find({ teacher: req.teacher, date: new Date(Date.UTC(year, month - 1, day)) })
+        const schedule = await Schedule.find({ teacher: req.teacher, date: new Date(date) })
         if (schedule.length) {
             for (const activity of schedule[0].activityList) {
                 if ((activity.start < newActivity.start && newActivity.start < activity.end) || (activity.start < newActivity.end && newActivity.end < activity.end)) {
@@ -478,7 +478,7 @@ const addActivitySchedule = async (req, res) => {
             // return res.json({ status: 'fail', msg: 'cannot find schedule to add activity' })
             let newSchedule = new Schedule({
                 teacher: req.teacher,
-                date: new Date(Date.UTC(year, month - 1, day)),
+                date: new Date(date),
                 activityList: [newActivity]
             })
             newSchedule.save((err, doc) => {
@@ -574,8 +574,9 @@ const getTuitions = async (req, res) => {
         // console.log(month, year)
         // console.log(start)
         // console.log(end)
+        console.log(`${time}-31`)
         const date = new Date(`${time}-31`)
-
+        console.log(date)
         try {
             const tuitions = await Tuition.find({
                 teacher: req.teacher,
