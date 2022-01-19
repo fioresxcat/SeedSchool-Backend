@@ -160,6 +160,7 @@ exports.sendNoti = async (req, res) => {
                 }
             })
         }
+        return res.json({status:'ok', msg:'send all noti ok'})
     } catch (err) {
         console.log(err)
         return res.status(500).json({ success: false, message: err.message })

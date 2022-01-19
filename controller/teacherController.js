@@ -663,7 +663,7 @@ const sendTuitionNoti = async (req, res) => {
                     parent: tuition.student.parent,
                     title: 'Thông báo học phí',
                     content: content,
-                    category: "học phí"
+                    category: "Học phí"
                 })
                 await mail.save()
             }

@@ -70,6 +70,9 @@ router.get('/api/teacher/tuition', checkTeacherRole, teacherController.getTuitio
 // cap nhat hoc phi thang hien tai
 router.get('/api/teacher/tuition/update', checkTeacherRole, teacherController.updateCurrentTuition)
 
+// gui thong bao hoc phi
+router.get('/api/teacher/tuition/sendnoti', checkTeacherRole, teacherController.sendTuitionNoti)
+
 // ----------------------------------------- hom thu -------------------------------
 // xem tat ca thu
 router.get('/api/teacher/mail', checkTeacherRole, teacherController.getAllMail)
