@@ -418,7 +418,7 @@ const getSchedule = async (req, res) => {
     if (date) {
         try {
             const schedules = await Schedule.find({ teacher: req.teacher, date: new Date(date) })
-            if (schedules) {
+            if (schedules.length) {
                 return res.json({ status: 'ok', msg: 'get schedule with date ok', schedules: schedules })
             } else {
                 return res.json({ status: 'fail', msg: 'cannot find any schedule with this teacher and date' })
