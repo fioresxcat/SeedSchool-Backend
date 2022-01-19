@@ -595,7 +595,7 @@ const getTuitions = async (req, res) => {
 
 const updateCurrentTuition = async (req, res) => {
     const date = new Date()
-    if(new Date(dt.getTime() + 86400000).getDate() === 1) {
+    if(new Date(date.getTime() + 86400000).getDate() === 1) {
         try {
             updateTuition(req.teacher, date)
         }catch(err) {
@@ -648,7 +648,7 @@ const sendTuitionNoti = async (req, res) => {
         if (tuitions.length) {
             for (const tuition of tuitions) {
                 let content = `
-                Nhà trường xin thông báo chi tiết về học phí tháng ${tuition.date.getMonth()} của cháu ${tuition.student.name}
+                Nhà trường xin thông báo chi tiết về học phí tháng ${tuition.date.getMonth()+1} của cháu ${tuition.student.name}
                 
                 Học phí cơ bản: ${tuition.baseTuition} triệu / tháng
                 Số buổi nghỉ có phép: ${tuition.validAbsence}

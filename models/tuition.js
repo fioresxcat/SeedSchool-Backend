@@ -47,11 +47,11 @@ const tuitionSchema = new Schema({
     collection: "tuitions"
 })
 
-// // virtual method: totalTuition
-// tuitionSchema.virtual('totalTuition').get(function() {
-//     const totalTuition = this.baseTuition + late1 * 0.01 + late2 * 0.05 - validAbsence * 0.05
-//     return totalTuition
-// })
+// virtual method: totalTuition
+tuitionSchema.virtual('totalTuition').get(function() {
+    const totalTuition = this.baseTuition + this.late1 * 0.01 + this.late2 * 0.05 - this.validAbsence * 0.05
+    return totalTuition
+})
 
 module.exports = mongoose.model("tuition", tuitionSchema);
 
