@@ -31,7 +31,7 @@ const parentMailSchema = new Schema({
     },
     commonActivity: {
         type: mongoose.SchemaTypes.ObjectId,
-        ref: 'activity'
+        ref: 'Activity'
     }
 }, {
     collection: "parentMails"

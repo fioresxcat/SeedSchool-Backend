@@ -35,6 +35,8 @@ router.put('/api/admin/activities/:id',check.checkAdmin, activity.update);
 router.delete('/api/admin/activities/:id',check.checkAdmin, activity.delete);
 router.get('/api/admin/activities/:id',check.checkAdmin, activity.find);
 router.get('/api/admin/activities/sendnoti/:id', check.checkAdmin, activity.sendNoti)
+router.get('/api/admin/activities/registerlist/:id', check.checkAdmin, activity.getRegisterList)
+
 
 //FoodMenu7
 router.post('/api/admin/foodmenu/add',check.checkAdmin, foodmenu.create);

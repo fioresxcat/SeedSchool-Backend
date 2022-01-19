@@ -663,23 +663,26 @@ const sendTuitionNoti = async (req, res) => {
     try {
         const tuitions = await Tuition.find({ teacher: req.teacher }).populate('student').sort({ date: -1 }).limit(req.teacher.numStudent)
         if (tuitions.length) {
+            console.log('tuition length: '+ tuitions.length)
             for (const tuition of tuitions) {
+                console.log(tuition)
                 let content = `
                 Nhà trường xin thông báo chi tiết về học phí tháng ${tuition.date.getMonth() + 1} của cháu ${tuition.student.name}
                 
-                Học phí cơ bản: ${tuition.baseTuition} triệu / tháng
-                Số buổi nghỉ có phép: ${tuition.validAbsence}
-                Số buổi nghỉ không phép: ${tuition.invalidAbsence}
-                Số buổi trông muộn trước 5 rưỡi chiều: ${tuition.late1}
-                Số buổi trông muộn sau 5 rưỡi chiều: ${tuition.late2}
+Học phí cơ bản: ${tuition.baseTuition} triệu / tháng
+Số buổi nghỉ có phép: ${tuition.validAbsence}
+Số buổi nghỉ không phép: ${tuition.invalidAbsence}
+Số buổi trông muộn trước 5 rưỡi chiều: ${tuition.late1}
+Số buổi trông muộn sau 5 rưỡi chiều: ${tuition.late2}
 
-                Tổng cộng học phí tháng: ${tuition.totalTuition}
+Tổng cộng học phí tháng: ${tuition.totalTuition}
 
-                Kính mong quý phụ huynh đóng học phí đầy đủ và đúng hạn. Nhà trường xin cảm ơn!
+Kính mong quý phụ huynh đóng học phí đầy đủ và đúng hạn. Nhà trường xin cảm ơn!
                 `
                 let mail = new ParentMail({
                     parent: tuition.student.parent,
                     title: 'Thông báo học phí',
+                    date: getCurrentDateWithUTC(new Date()),
                     content: content,
                     category: "Học phí"
                 })
