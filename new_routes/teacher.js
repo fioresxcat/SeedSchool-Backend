@@ -59,7 +59,7 @@ router.post('/api/teacher/activity', checkTeacherRole, teacherController.addActi
 // sua tkb
 router.put('/api/teacher/activity', checkTeacherRole, teacherController.editActivitySchedule)
 // xoa tkb
-router.delete('/api/teacher/activity/:id', checkTeacherRole, teacherController.deleteActivitySchedule)
+router.delete('/api/teacher/activity', checkTeacherRole, teacherController.deleteActivitySchedule)
 
 // ------------------------------------- hoc phi ----------------------------
 // xem hoc phi theo thang

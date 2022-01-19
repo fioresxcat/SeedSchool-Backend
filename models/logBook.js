@@ -17,7 +17,6 @@ const logBookSchema = new Schema({
     date: {
         type: Date,
         required: true,
-        default: Date.now()
     },
     attendancePicture: {
         type: String,
@@ -60,6 +59,7 @@ logBookSchema.virtual('schedule', {
     foreignField: ['teacher', 'date'],
     justOne: true
 })
+
 
 module.exports = mongoose.model("logBook", logBookSchema);
 

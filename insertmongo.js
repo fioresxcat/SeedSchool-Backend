@@ -147,81 +147,92 @@ async function save(entity) {
 //     }
 // })
 
-updateTuition('61e69cbe8dcecb4422b7af0c', new Date(Date.UTC(2022, 0, 31)))
-async function updateTuition(teacher, date) {
-    let allStudentTuitions
+// updateTuition('61e69cbe8dcecb4422b7af0c', new Date(Date.UTC(2022, 0, 31)))
+// async function updateTuition(teacher, date) {
+//     let allStudentTuitions
 
-    const month = date.getMonth()
-    const year = date.getFullYear()
-    let start, end
-    if(month==0) {
-        start = new Date(Date.UTC(year, month, 1))
-        end = new Date(Date.UTC(year, month + 1, 1))
+//     const month = date.getMonth()
+//     const year = date.getFullYear()
+//     let start, end
+//     if(month==0) {
+//         start = new Date(Date.UTC(year, month, 1))
+//         end = new Date(Date.UTC(year, month + 1, 1))
 
-    } else {
-        start = new Date(Date.UTC(year, month-1, 1))
-        end = new Date(Date.UTC(year, month, 1))
-    }
+//     } else {
+//         start = new Date(Date.UTC(year, month-1, 1))
+//         end = new Date(Date.UTC(year, month, 1))
+//     }
     
 
-    try {
-        allStudentTuitions = await LogBook.aggregate([
-            {
-                $match: {
-                    "teacher": mongoose.Types.ObjectId(teacher),
-                    "date": { $gte: start, $lt: end }
-                }
-            },
-            {
-                $group: {
-                    _id: '$student',
-                    total_lookafter_late_1: {
-                        $sum: "$lookAfterLate1"
-                    },
-                    total_lookafter_late_2: {
-                        $sum: "$lookAfterLate2"
-                    },
-                    total_valid_absence: {
-                        $sum: "$lateForSchool1"
-                    },
-                    total_invalid_absence: {
-                        $sum: "$lateForSchool2"
-                    }
-                }
-            }
+//     try {
+//         allStudentTuitions = await LogBook.aggregate([
+//             {
+//                 $match: {
+//                     "teacher": mongoose.Types.ObjectId(teacher),
+//                     "date": { $gte: start, $lt: end }
+//                 }
+//             },
+//             {
+//                 $group: {
+//                     _id: '$student',
+//                     total_lookafter_late_1: {
+//                         $sum: "$lookAfterLate1"
+//                     },
+//                     total_lookafter_late_2: {
+//                         $sum: "$lookAfterLate2"
+//                     },
+//                     total_valid_absence: {
+//                         $sum: "$lateForSchool1"
+//                     },
+//                     total_invalid_absence: {
+//                         $sum: "$lateForSchool2"
+//                     }
+//                 }
+//             }
 
-        ])
-        console.log(allStudentTuitions)
+//         ])
+//         console.log(allStudentTuitions)
 
-        // sử dụng thằng ở trên để uppdate vào tuition database
-        for (const tuition of allStudentTuitions) {
-            saveTuition(tuition, teacher, date)
-        }
-
-
-        return allStudentTuitions
-    } catch (err) {
-        console.log(err)
-    }
+//         // sử dụng thằng ở trên để uppdate vào tuition database
+//         for (const tuition of allStudentTuitions) {
+//             saveTuition(tuition, teacher, date)
+//         }
 
 
-}
+//         return allStudentTuitions
+//     } catch (err) {
+//         console.log(err)
+//     }
 
-async function saveTuition(tuition, teacher, date) {
-    let newTuition = new Tuition({
-        teacher: teacher,
-        student: tuition._id,
-        date: date,
-        validAbsence: tuition.total_valid_absence,
-        invalidAbsence: tuition.total_invalid_absence,
-        late1: tuition.total_lookafter_late_1,
-        late2: tuition.total_lookafter_late_2,
-    })
 
-    try {
-        newTuition.save()
-        console.log('save tuition ok')
-    } catch (err) {
-        console.log('cannot save new tuition')
-    }
-}
+// }
+
+// async function saveTuition(tuition, teacher, date) {
+//     let newTuition = new Tuition({
+//         teacher: teacher,
+//         student: tuition._id,
+//         date: date,
+//         validAbsence: tuition.total_valid_absence,
+//         invalidAbsence: tuition.total_invalid_absence,
+//         late1: tuition.total_lookafter_late_1,
+//         late2: tuition.total_lookafter_late_2,
+//     })
+
+//     try {
+//         newTuition.save()
+//         console.log('save tuition ok')
+//     } catch (err) {
+//         console.log('cannot save new tuition')
+//     }
+// }
+
+// let t = new Date(2022,0,1,6,30,0)
+// const day = t.getDate()
+// const month = t.getMonth()
+// const year = t.getFullYear()
+// console.log(year, month, day)
+// const new_date = new Date(Date.UTC(year, month, day))
+// console.log(new_date)
+// console.log(t.getUTCDate())
+// console.log(t)
+console.log(new Date())

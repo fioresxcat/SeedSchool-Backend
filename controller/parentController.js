@@ -121,7 +121,7 @@ const getLogBook = async (req, res) => {
 // --------------------------------------- thoi khoa bieu -------------------------------------------
 const getSchedule = async (req, res) => {
     console.log('call to get schedule parent')
-    const date = req.query.date
+    const date = req.query.date // yyyy-mm-dd
     if (!date) {
         try {
             const student = await Student.findOne({ parent: req.parent })
@@ -177,7 +177,8 @@ const getTuition = async (req, res) => {
     } else { // neu co thang gui len, tra lai hoc phi cua thang do
         const year = parseInt(time.split('-')[0])
         const month = parseInt(time.split('-')[1])
-        const date = new Date(Date.UTC(year, month - 1, 31))
+        // const date = new Date(Date.UTC(year, month - 1, 31))
+        const date = new Date(`${time}-31`)
 
         try {
             const student = await Student.findOne({ parent: req.parent._id })
@@ -245,6 +246,7 @@ const postMail = async (req, res) => {
         if (teacher) {
             let mail = new TeacherMail({
                 teacher: teacher,
+                date: getCurrentDateWithUTC(Date.now()),
                 parent: req.parent,
                 title: title,
                 content: content
@@ -331,6 +333,14 @@ const getMenu = async (req, res) => {
                 res.status(500).send({success: false, message : err.message || "Error Occurred while retriving Food Menu information" })
             })
     }
+}
+
+
+function getCurrentDateWithUTC(t) {
+    const day = t.getDate()
+    const month = t.getMonth()
+    const year = t.getFullYear()
+    return new Date(Date.UTC(year, month, day))
 }
 
 module.exports.login = login

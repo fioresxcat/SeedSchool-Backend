@@ -10,8 +10,7 @@ const parentMailSchema = new Schema({
     },
     date: {
         type: Date,
-        required: true,
-        default: Date.now()
+        required: true
     },
     title: {
         type: String,
@@ -37,5 +36,8 @@ const parentMailSchema = new Schema({
 }, {
     collection: "parentMails"
 })
+
+
+
 module.exports = mongoose.model("parentMail", parentMailSchema);
 
