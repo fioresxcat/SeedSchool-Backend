@@ -609,13 +609,13 @@ const updateCurrentTuition = async (req, res) => {
 
 const updateCurrentTuitionFake = async (req, res) => {
     try {
-        updateTuition(req.teacher, new Date(Date.UTC(2022, 1, 31)))
+        updateTuition(req.teacher, new Date(Date.UTC(2022, 0, 31)))
     }catch(err) {
         console.log(err)
         return res.json({status:'fail', msg:err.message})
     }
     
-        return res.json({status:'ok', msg:'update tuitions ok'})
+    return res.json({status:'ok', msg:'update tuitions ok'})
     
 }
 
