@@ -11,7 +11,7 @@ exports.checkAuth = async (req, res, next) => {
 	try {
         const authHeader = req.header('Authorization')
 	    const token = authHeader && authHeader.split(' ')[1]
-		const idUser = jwt.verify(token,'mk')
+		const idUser = jwt.verify(token,'admin')
         await Admin.findOne({idUser})
         .then((data)=>{
             if(data){
@@ -29,7 +29,7 @@ exports.checkLogin = async (req, res, next) => {
 	try {
         const authHeader = req.header('Authorization')
 	    const token = authHeader && authHeader.split(' ')[1]
-		const idUser = jwt.verify(token,'mk')
+		const idUser = jwt.verify(token,'admin')
         await Admin.findOne({idUser})
         .then((data)=>{
             if(data){
