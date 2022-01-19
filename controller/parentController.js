@@ -97,6 +97,7 @@ const getLogBook = async (req, res) => {
         }
     } else {
         const date = new Date(req.query.date)
+        console.log(date)
         try {
             const student = await Student.findOne({ parent: req.parent })
             if (student) {

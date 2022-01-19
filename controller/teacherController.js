@@ -69,7 +69,6 @@ const getStudents = async (req, res) => {
 // get student with id param
 const getStudent = async (req, res) => {
     try {
-
         const student = await Student.findById(req.params.id).populate('parent')
         if (student) {
             return res.json({ status: 'ok', msg: 'get student ok', student: student })
@@ -242,8 +241,9 @@ const getLogBooks = async (req, res) => {
         try {
             const logBooks = await LogBook.find({ teacher: req.teacher }).populate('student').sort({ date: -1 })
             if (logBooks.length) {
-                const lastestDate = logBooks[0].date
-                const latestLogBooks = logBooks.filter(logBook => logBook.date.getTime() === lastestDate.getTime())
+                const latestDate = getFullDate(logBooks[0].date)
+                console.log(latestDate)
+                const latestLogBooks = logBooks.filter(logBook => getFullDate(logBook.date).getTime() === latestDate.getTime())
                 return res.json({ status: 'ok', msg: 'get logbook ok', logBooks: latestLogBooks })
             } else {
                 return res.json({ status: 'fail', msg: 'cannot get logbook with latestdate' })
@@ -382,16 +382,16 @@ const addLogBook = async (req, res) => {
     }
 
     const date = new Date()
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    const day = date.getDate()
+    // const year = date.getFullYear()
+    // const month = date.getMonth()
+    // const day = date.getDate()
 
     let logBook = new LogBook({
         student: student,
         teacher: req.teacher,
         attendancePicture: attendancePicture,
         comment: comment,
-        date: new Date(Date.UTC(year, month, day)),
+        date: date,
         lookAfterLate1: lookAfterLate1,
         lookAfterLate2: lookAfterLate2,
         lateForSchool1: lateForSchool1,
@@ -785,6 +785,12 @@ async function saveTuition(tuition, teacher, date) {
 }
 
 //function convertDateToUTC(date) { return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); }
+function getFullDate(date) {
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const day = date.getDate()
+    return new Date(year, month, day)
+}
 
 module.exports.login = login
 module.exports.getStudents = getStudents
