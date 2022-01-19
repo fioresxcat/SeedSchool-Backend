@@ -60,6 +60,7 @@ logBookSchema.virtual('schedule', {
     justOne: true
 })
 
+
 module.exports = mongoose.model("logBook", logBookSchema);
 
 //các thao tác

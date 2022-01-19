@@ -43,7 +43,9 @@ router.get('/api/parent/mail/:id', checkParentRole, parentController.getDetailMa
 router.post('/api/parent/mail', checkParentRole, parentController.postMail)
 
 // dang ki tham gia hoat dong chung
-router.post('/api/parent/mail/register/:id', checkParentRole, parentController.registerCommonActivity)
+router.get('/api/parent/mail/register/:id', checkParentRole, parentController.registerCommonActivity)
+router.get('/api/parent/mail/unregister/:id', checkParentRole, parentController.unregisterCommonActivity)
+
 
 // xem menu
 router.get('/api/parent/foodmenu', checkParentRole, parentController.getMenu)

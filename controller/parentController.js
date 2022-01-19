@@ -7,11 +7,13 @@ const Schedule = require('../models/schedule')
 const ParentMail = require('../models/parentMail')
 const TeacherMail = require('../models/teacherMail')
 const FoodMenu = require('../models/FoodMenu')
+const Activity = require('../models/activity')
+
 const jwt = require('jsonwebtoken')
 
 const login = async (req, res) => {
     console.log('call to login parent')
-    if (req.headers.authorization.split(' ')[1] === 'undefined') { // neu khong co token gui len
+    if (req.body || req.headers.authorization.split(' ')[1] === 'undefined') { // neu khong co token gui len
         console.log('Đăng nhập không có authorization')
         // console.log(req.headers)
         const username = req.body.username
@@ -97,6 +99,7 @@ const getLogBook = async (req, res) => {
         }
     } else {
         const date = new Date(req.query.date)
+        console.log(date)
         try {
             const student = await Student.findOne({ parent: req.parent })
             if (student) {
@@ -120,7 +123,7 @@ const getLogBook = async (req, res) => {
 // --------------------------------------- thoi khoa bieu -------------------------------------------
 const getSchedule = async (req, res) => {
     console.log('call to get schedule parent')
-    const date = req.query.date
+    const date = req.query.date // yyyy-mm-dd
     if (!date) {
         try {
             const student = await Student.findOne({ parent: req.parent })
@@ -176,7 +179,8 @@ const getTuition = async (req, res) => {
     } else { // neu co thang gui len, tra lai hoc phi cua thang do
         const year = parseInt(time.split('-')[0])
         const month = parseInt(time.split('-')[1])
-        const date = new Date(Date.UTC(year, month - 1, 31))
+        // const date = new Date(Date.UTC(year, month - 1, 31))
+        const date = new Date(`${time}-31`)
 
         try {
             const student = await Student.findOne({ parent: req.parent._id })
@@ -244,6 +248,7 @@ const postMail = async (req, res) => {
         if (teacher) {
             let mail = new TeacherMail({
                 teacher: teacher,
+                date: getCurrentDateWithUTC(Date.now()),
                 parent: req.parent,
                 title: title,
                 content: content
@@ -301,6 +306,48 @@ const registerCommonActivity = async (req, res) => {
         console.log(err)
         return res.json({ status: 'fail', msg: err.message })
     }
+}
+
+// dang ky tham gia hoat dong
+const unregisterCommonActivity = async (req, res) => {
+    console.log('call to register activity parent')
+    // cap nhat parentMail
+    try {
+        let mail = await ParentMail.findById(req.params.id).populate('commonActivity')
+        if (mail) {
+            if (mail.registered == true) {
+                mail.registered = false // sua thanh da dang ki
+
+                // remove
+                const index = mail.commonActivity.registerList.indexOf(req.parent._id)
+                if (index>-1) {
+                    mail.commonActivity.registerList.splice(index, 1)
+                }
+                mail.commonActivity.save((err, doc) => {
+                    if (err) {
+                        console.log(err)
+                        return res.json({ status: 'fail', msg: 'error saving common activity' })
+                    } else {
+                        mail.save((err, doc) => {
+                            if (err) {
+                                console.log(err)
+                                return res.json({ status: 'fail', msg: 'error unregistering hoat dong' })
+                            } else {
+                                return res.json({ status: 'ok', msg: 'huy dang ki hoat dong ok', mail: doc })
+                            }
+                        })
+                    }
+                })
+            } else {
+                return res.json({status:'fail', msg:'ban chua dang ki hoat dong nay'})
+            }
+        } else {
+            return res.json({ status: 'fail', msg: 'cannot find mail with this id' })
+        }
+    } catch (err) {
+        console.log(err)
+        return res.json({ status: 'fail', msg: err.message })
+    }
 
 }
 
@@ -332,6 +379,14 @@ const getMenu = async (req, res) => {
     }
 }
 
+
+function getCurrentDateWithUTC(t) {
+    const day = t.getDate()
+    const month = t.getMonth()
+    const year = t.getFullYear()
+    return new Date(Date.UTC(year, month, day))
+}
+
 module.exports.login = login
 module.exports.getDetailStudent = getDetailStudent
 module.exports.getLogBook = getLogBook
@@ -342,3 +397,4 @@ module.exports.getSchedule = getSchedule
 module.exports.postMail = postMail
 module.exports.registerCommonActivity = registerCommonActivity
 module.exports.getMenu = getMenu
+module.exports.unregisterCommonActivity = unregisterCommonActivity

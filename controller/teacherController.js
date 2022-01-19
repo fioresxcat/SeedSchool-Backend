@@ -69,7 +69,6 @@ const getStudents = async (req, res) => {
 // get student with id param
 const getStudent = async (req, res) => {
     try {
-
         const student = await Student.findById(req.params.id).populate('parent')
         if (student) {
             return res.json({ status: 'ok', msg: 'get student ok', student: student })
@@ -242,8 +241,9 @@ const getLogBooks = async (req, res) => {
         try {
             const logBooks = await LogBook.find({ teacher: req.teacher }).populate('student').sort({ date: -1 })
             if (logBooks.length) {
-                const lastestDate = logBooks[0].date
-                const latestLogBooks = logBooks.filter(logBook => logBook.date.getTime() === lastestDate.getTime())
+                const latestDate = logBooks[0].date
+                console.log(latestDate)
+                const latestLogBooks = logBooks.filter(logBook => logBook.date.getTime() === latestDate.getTime())
                 return res.json({ status: 'ok', msg: 'get logbook ok', logBooks: latestLogBooks })
             } else {
                 return res.json({ status: 'fail', msg: 'cannot get logbook with latestdate' })
@@ -254,6 +254,7 @@ const getLogBooks = async (req, res) => {
         }
     } else if (date && !student) { // co ngay + ko student: hien thi logbook trong ngay do
         try {
+            console.log(new Date(date))
             const logBooks = await LogBook.find({ date: new Date(date), teacher: req.teacher }).populate('student')
             if (logBooks) {
                 return res.json({ status: 'ok', msg: 'get logbook with date and no student ok', logBooks: logBooks })
@@ -381,17 +382,16 @@ const addLogBook = async (req, res) => {
         lookAfterLate2 = 1
     }
 
-    const date = new Date()
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    const day = date.getDate()
+    // const year = date.getFullYear()
+    // const month = date.getMonth()
+    // const day = date.getDate()
 
     let logBook = new LogBook({
         student: student,
         teacher: req.teacher,
         attendancePicture: attendancePicture,
         comment: comment,
-        date: new Date(Date.UTC(year, month, day)),
+        date: getCurrentDateWithUTC(new Date()),
         lookAfterLate1: lookAfterLate1,
         lookAfterLate2: lookAfterLate2,
         lateForSchool1: lateForSchool1,
@@ -418,7 +418,8 @@ const getSchedule = async (req, res) => {
     if (date) {
         try {
             const schedules = await Schedule.find({ teacher: req.teacher, date: new Date(date) })
-            if (schedules) {
+            if (schedules.length) {
+                console.log(schedules.length)
                 return res.json({ status: 'ok', msg: 'get schedule with date ok', schedules: schedules })
             } else {
                 return res.json({ status: 'fail', msg: 'cannot find any schedule with this teacher and date' })
@@ -449,15 +450,15 @@ const addActivitySchedule = async (req, res) => {
     const month = parseInt(date.split('-')[1])
     const day = parseInt(date.split('-')[2])
 
-    const timestart = new Date(Date.UTC(year, month-1, day, start.split(':')[0], start.split(':')[1]))
-    const timeend = new Date(Date.UTC(year, month-1, day, end.split(':')[0], end.split(':')[1]))
+    const timestart = new Date(Date.UTC(year, month - 1, day, start.split(':')[0], start.split(':')[1]))
+    const timeend = new Date(Date.UTC(year, month - 1, day, end.split(':')[0], end.split(':')[1]))
     newActivity.start = timestart
     newActivity.end = timeend
     console.log(newActivity.start)
     console.log(newActivity.end)
 
     try {
-        const schedule = await Schedule.find({teacher: req.teacher, date: new Date(Date.UTC(year, month-1, day))})
+        const schedule = await Schedule.find({ teacher: req.teacher, date: new Date(date) })
         if (schedule.length) {
             for (const activity of schedule[0].activityList) {
                 if ((activity.start < newActivity.start && newActivity.start < activity.end) || (activity.start < newActivity.end && newActivity.end < activity.end)) {
@@ -478,15 +479,15 @@ const addActivitySchedule = async (req, res) => {
             // return res.json({ status: 'fail', msg: 'cannot find schedule to add activity' })
             let newSchedule = new Schedule({
                 teacher: req.teacher,
-                date: new Date(Date.UTC(year, month-1, day)),
+                date: new Date(date),
                 activityList: [newActivity]
             })
-            newSchedule.save((err,doc)=> {
-                if(err) {
+            newSchedule.save((err, doc) => {
+                if (err) {
                     console.log(err)
-                    return res.json({status:'fail', msg:err.message})
+                    return res.json({ status: 'fail', msg: err.message })
                 } else {
-                    return res.json({status:'ok', msg:'add new schedule and new activity ok', schedule:doc})
+                    return res.json({ status: 'ok', msg: 'add new schedule and new activity ok', schedule: doc })
                 }
             })
         }
@@ -556,7 +557,7 @@ const getTuitions = async (req, res) => {
 
     if (!time) { // nếu ko có thang gửi lên, hiển thị dữ liệu học phí của tháng gần nhất trong csdl
         try {
-            const tuitions = await Tuition.find({ teacher: req.teacher }).sort({ date: -1 }).limit(req.teacher.numStudent)
+            const tuitions = await Tuition.find({ teacher: req.teacher }).sort({ date: -1 }).limit(req.teacher.numStudent).populate('student')
             if (tuitions.length) {
                 return res.json({ status: 'ok', msg: 'get tuition for latest month ok', tuitions: tuitions })
             } else {
@@ -567,19 +568,22 @@ const getTuitions = async (req, res) => {
             return res.json({ status: 'fail', msg: err.message })
         }
     } else { // neu co thang gui len, hien thi hoc phi cua thang do
-        const month = parseInt(time.split('-')[1])
-        const year = parseInt(time.split('-')[0])
-        const start = `${year}-${month}-01`
-        const end = `${year}-${month + 1}-01`
-        console.log(month, year)
-        console.log(start)
-        console.log(end)
-
+        // const month = parseInt(time.split('-')[1])
+        // const year = parseInt(time.split('-')[0])
+        // const start = `${year}-${month}-01`
+        // const end = `${year}-${month + 1}-01`
+        // console.log(month, year)
+        // console.log(start)
+        // console.log(end)
+        console.log(`${time}-31`)
+        const date = new Date(`${time}-31`)
+        console.log(date)
         try {
             const tuitions = await Tuition.find({
                 teacher: req.teacher,
-                date: { $gte: new Date(start), $lt: new Date(end) }
-            })
+                // date: { $gte: new Date(start), $lt: new Date(end) }
+                date: date
+            }).populate('student')
             if (tuitions.length) {
                 return res.json({ status: 'ok', msg: 'get tuitions with date ok', tuitions: tuitions })
             } else {
@@ -596,28 +600,28 @@ const getTuitions = async (req, res) => {
 
 const updateCurrentTuition = async (req, res) => {
     const date = new Date()
-    if(new Date(date.getTime() + 86400000).getDate() === 1) {
+    if (new Date(date.getTime() + 86400000).getDate() === 1) {
         try {
             updateTuition(req.teacher, date)
-        }catch(err) {
+        } catch (err) {
             console.log(err)
-            return res.json({status:'fail', msg:err.message})
+            return res.json({ status: 'fail', msg: err.message })
         }
     } else {
-        return res.json({status:'fail', msg:'chua den cuoi thang'})
+        return res.json({ status: 'fail', msg: 'chua den cuoi thang' })
     }
 }
 
 const updateCurrentTuitionFake = async (req, res) => {
     try {
         updateTuition(req.teacher, new Date(Date.UTC(2022, 0, 31)))
-    }catch(err) {
+    } catch (err) {
         console.log(err)
-        return res.json({status:'fail', msg:err.message})
+        return res.json({ status: 'fail', msg: err.message })
     }
-    
-    return res.json({status:'ok', msg:'update tuitions ok'})
-    
+
+    return res.json({ status: 'ok', msg: 'update tuitions ok' })
+
 }
 
 // ------------------------------------------- hom thu ----------------------------------------
@@ -659,29 +663,32 @@ const sendTuitionNoti = async (req, res) => {
     try {
         const tuitions = await Tuition.find({ teacher: req.teacher }).populate('student').sort({ date: -1 }).limit(req.teacher.numStudent)
         if (tuitions.length) {
+            console.log('tuition length: '+ tuitions.length)
             for (const tuition of tuitions) {
+                console.log(tuition)
                 let content = `
-                Nhà trường xin thông báo chi tiết về học phí tháng ${tuition.date.getMonth()+1} của cháu ${tuition.student.name}
+                Nhà trường xin thông báo chi tiết về học phí tháng ${tuition.date.getMonth() + 1} của cháu ${tuition.student.name}
                 
-                Học phí cơ bản: ${tuition.baseTuition} triệu / tháng
-                Số buổi nghỉ có phép: ${tuition.validAbsence}
-                Số buổi nghỉ không phép: ${tuition.invalidAbsence}
-                Số buổi trông muộn trước 5 rưỡi chiều: ${tuition.late1}
-                Số buổi trông muộn sau 5 rưỡi chiều: ${tuition.late2}
+Học phí cơ bản: ${tuition.baseTuition} triệu / tháng
+Số buổi nghỉ có phép: ${tuition.validAbsence}
+Số buổi nghỉ không phép: ${tuition.invalidAbsence}
+Số buổi trông muộn trước 5 rưỡi chiều: ${tuition.late1}
+Số buổi trông muộn sau 5 rưỡi chiều: ${tuition.late2}
 
-                Tổng cộng học phí tháng: ${tuition.totalTuition}
+Tổng cộng học phí tháng: ${tuition.totalTuition}
 
-                Kính mong quý phụ huynh đóng học phí đầy đủ và đúng hạn. Nhà trường xin cảm ơn!
+Kính mong quý phụ huynh đóng học phí đầy đủ và đúng hạn. Nhà trường xin cảm ơn!
                 `
                 let mail = new ParentMail({
                     parent: tuition.student.parent,
                     title: 'Thông báo học phí',
+                    date: getCurrentDateWithUTC(new Date()),
                     content: content,
                     category: "Học phí"
                 })
                 await mail.save()
             }
-            return res.json({status:'ok', msg:'send all tuition noti ok'})
+            return res.json({ status: 'ok', msg: 'send all tuition noti ok' })
         } else {
             return res.json({ status: 'fail', msg: 'cannot find tuitions with this teacher' })
         }
@@ -712,15 +719,15 @@ async function updateTuition(teacher, date) {
     const month = date.getMonth()
     const year = date.getFullYear()
     let start, end
-    if(month==0) {
+    if (month == 0) {
         start = new Date(Date.UTC(year, month, 1))
         end = new Date(Date.UTC(year, month + 1, 1))
 
     } else {
-        start = new Date(Date.UTC(year, month-1, 1))
+        start = new Date(Date.UTC(year, month - 1, 1))
         end = new Date(Date.UTC(year, month, 1))
     }
-    
+
 
     try {
         allStudentTuitions = await LogBook.aggregate([
@@ -785,6 +792,19 @@ async function saveTuition(tuition, teacher, date) {
 }
 
 //function convertDateToUTC(date) { return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); }
+function getFullDate(date) {
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const day = date.getDate()
+    return new Date(year, month, day)
+}
+
+function getCurrentDateWithUTC(t) {
+    const day = t.getDate()
+    const month = t.getMonth()
+    const year = t.getFullYear()
+    return new Date(Date.UTC(year, month, day))
+}
 
 module.exports.login = login
 module.exports.getStudents = getStudents
