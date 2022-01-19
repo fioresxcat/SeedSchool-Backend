@@ -6,13 +6,14 @@ const Teacher = require('../models/teacher')
 const Schedule = require('../models/schedule')
 const ParentMail = require('../models/parentMail')
 const TeacherMail = require('../models/teacherMail')
-
+const FoodMenu = require('../models/FoodMenu')
 const jwt = require('jsonwebtoken')
 
 const login = async (req, res) => {
+    console.log('call to login parent')
     if (req.headers.authorization.split(' ')[1] === 'undefined') { // neu khong co token gui len
         console.log('Đăng nhập không có authorization')
-        console.log(req.headers)
+        // console.log(req.headers)
         const username = req.body.username
         const password = req.body.password
         console.log(username, password)
@@ -26,10 +27,11 @@ const login = async (req, res) => {
                 return res.json({ status: 'fail', msg: 'parent not found' })
             }
         } catch (err) {
-            console.log('server error')
             console.log(err)
+            return res.json({status:'fail', msg:'server error'})
         }
     } else { // nếu có token gửi kèm lên, tức là người dùng đã đăng nhập trong phiên đó rồi
+        console.log('dang nhap co kem token')
         const token = req.headers.authorization.split(' ')[1];
         if (token) {
             jwt.verify(token, 'mk', (err, result) => {
@@ -43,12 +45,15 @@ const login = async (req, res) => {
                     })
                 }
             })
+        } else {
+            console.log(token)
         }
     }
 }
 
 
 const getDetailStudent = async (req, res, next) => {
+    console.log('call to get detail student parent')
     const parent = req.parent
     try {
         const student = await Student.findOne({ parent: parent._id }).populate('teacher')
@@ -67,11 +72,12 @@ const getDetailStudent = async (req, res, next) => {
 
 // ---------------------------------------------- so theo doi ---------------------------------------------
 const getLogBook = async (req, res) => {
+    console.log('call to get log book parent')
     if (!req.query.date) {
         try {
             const student = await Student.findOne({ parent: req.parent._id })
             if (student) {
-                const logBooks = await LogBook.find({ student: student._id }).populate('schedule').populate('student').sort({ date: 1 }).limit(10)
+                const logBooks = await LogBook.find({ student: student._id }).populate('student').sort({ date: 1 }).limit(10)
                 if (logBooks) {
                     // let schedules = []
                     // for (const logBook of logBooks) {
@@ -94,7 +100,7 @@ const getLogBook = async (req, res) => {
         try {
             const student = await Student.findOne({ parent: req.parent })
             if (student) {
-                const logBook = await LogBook.findOne({ student: student.id, date: date })
+                const logBook = await LogBook.findOne({ student: student.id, date: date }).populate('student')
                 if (logBook) {
                     return res.json({ status: 'ok', msg: 'get logbook ok', logBook: logBook })
                 } else {
@@ -113,6 +119,7 @@ const getLogBook = async (req, res) => {
 
 // --------------------------------------- thoi khoa bieu -------------------------------------------
 const getSchedule = async (req, res) => {
+    console.log('call to get schedule parent')
     const date = req.query.date
     if (!date) {
         try {
@@ -146,6 +153,7 @@ const getSchedule = async (req, res) => {
 // ------------------------------------- hoc phi ---------------------------------------------
 
 const getTuition = async (req, res) => {
+    console.log('call to get tuition parent')
     const time = req.query.time // yyyy-mm
     if (!time) { // neu ko co thang gui len, tra lai hoc phi 10 thang gan nhat
         try {
@@ -195,6 +203,7 @@ const getTuition = async (req, res) => {
 // ------------------------------------- hom thu -----------------------------------------
 // xem tat ca mail
 const getAllMail = async (req, res) => {
+    console.log('call to get all mail parent')
     try {
         const mails = await ParentMail.find({ parent: req.parent })
         if (mails.length) {
@@ -211,6 +220,7 @@ const getAllMail = async (req, res) => {
 
 // lay mail dua vao id client truyen len
 const getDetailMail = async (req, res) => {
+    console.log('call to get detail mail parent')
     try {
         const mail = await ParentMail.findById(req.params.id)
         if (mail) {
@@ -227,6 +237,7 @@ const getDetailMail = async (req, res) => {
 
 // gui mail cho giao vien
 const postMail = async (req, res) => {
+    console.log('call to post mail parent')
     const { title, content } = req.body
     try {
         const teacher = await Teacher.findById(req.parent.student.teacher)
@@ -257,6 +268,7 @@ const postMail = async (req, res) => {
 
 // dang ky tham gia hoat dong
 const registerCommonActivity = async (req, res) => {
+    console.log('call to register activity parent')
     // cap nhat parentMail
     try {
         let mail = await ParentMail.findById(req.params.id).populate('commonActivity')
@@ -292,7 +304,33 @@ const registerCommonActivity = async (req, res) => {
 
 }
 
+const getMenu = async (req, res) => {
+    console.log('call to get menu parent ')
+    if(req.params.id){
+        const id = req.params.id;
 
+        FoodMenu.findById(id)
+            .then(data =>{
+                if(!data){
+                    res.status(404).send({ success: false, message : "Not found  with id "+ id})
+                }else{
+                    res.json(data)
+                }
+            })
+            .catch(err =>{
+                res.status(500).json({success: false, message: "Erro retrieving Food Menu with id " + id})
+            })
+
+    }else{
+        FoodMenu.find()
+            .then(data => {
+                res.json(data)
+            })
+            .catch(err => {
+                res.status(500).send({success: false, message : err.message || "Error Occurred while retriving Food Menu information" })
+            })
+    }
+}
 
 module.exports.login = login
 module.exports.getDetailStudent = getDetailStudent
@@ -303,3 +341,4 @@ module.exports.getDetailMail = getDetailMail
 module.exports.getSchedule = getSchedule
 module.exports.postMail = postMail
 module.exports.registerCommonActivity = registerCommonActivity
+module.exports.getMenu = getMenu

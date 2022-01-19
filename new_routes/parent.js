@@ -45,4 +45,7 @@ router.post('/api/parent/mail', checkParentRole, parentController.postMail)
 // dang ki tham gia hoat dong chung
 router.post('/api/parent/mail/register/:id', checkParentRole, parentController.registerCommonActivity)
 
+// xem menu
+router.get('/api/parent/foodmenu', checkParentRole, parentController.getMenu)
+
 module.exports = router
