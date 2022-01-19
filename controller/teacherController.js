@@ -642,6 +642,7 @@ const getDetailMail = async (req, res) => {
 
 // gui thong bao hoc phi
 const sendTuitionNoti = async (req, res) => {
+    console.log('thong bao hocj phiiiiiiiiii')
     try {
         const tuitions = await Tuition.find({ teacher: req.teacher }).populate('student').sort({ date: -1 }).limit(req.teacher.numStudent)
         if (tuitions.length) {
@@ -667,6 +668,7 @@ const sendTuitionNoti = async (req, res) => {
                 })
                 await mail.save()
             }
+            return res.json({status:'ok', msg:'send all tuition noti ok'})
         } else {
             return res.json({ status: 'fail', msg: 'cannot find tuitions with this teacher' })
         }
