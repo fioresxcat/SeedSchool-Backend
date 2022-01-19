@@ -69,7 +69,7 @@ exports.checkAdmin =  (req, res, next) => {
     try{
         const authHeader = req.header('Authorization')
 	    const token = authHeader && authHeader.split(' ')[1]
-        const idUser = jwt.verify(token,'mk')
+        const idUser = jwt.verify(token,'admin')
         Admin.findOne({
             idUser
         })
