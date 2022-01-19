@@ -319,9 +319,9 @@ const unregisterCommonActivity = async (req, res) => {
                 mail.registered = false // sua thanh da dang ki
 
                 // remove
-                const index = mail.commonActivity.indexOf(req.parent._id)
+                const index = mail.commonActivity.registerList.indexOf(req.parent._id)
                 if (index>-1) {
-                    mail.commonActivity.splice(index, 1)
+                    mail.commonActivity.registerList.splice(index, 1)
                 }
                 mail.commonActivity.save((err, doc) => {
                     if (err) {
@@ -339,7 +339,7 @@ const unregisterCommonActivity = async (req, res) => {
                     }
                 })
             } else {
-                return res.json({status:'fail', msg:'ban da dang ki hoat dong nay'})
+                return res.json({status:'fail', msg:'ban chua dang ki hoat dong nay'})
             }
         } else {
             return res.json({ status: 'fail', msg: 'cannot find mail with this id' })
