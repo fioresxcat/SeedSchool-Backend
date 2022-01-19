@@ -192,7 +192,7 @@ exports.getRegisterList = async (req, res) => {
             for (const parent of activity.registerList) {
                 let student
                 try {
-                    student = await Student.findOne({ parent: parent }).populate('parent')
+                    student = await Student.findOne({ parent: parent }).populate('parent').populate('teacher')
                 } catch (err) {
                     console.log(err)
                     return res.json({ status: 'fail', msg: err.message })
