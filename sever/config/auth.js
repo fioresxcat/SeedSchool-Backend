@@ -44,7 +44,7 @@ exports.checkLogin = async (req, res, next) => {
 }
 
 
-exports.checkTeacher =async (req, res,next ) => {
+/* exports.checkTeacher =async (req, res,next ) => {
     try{
         const authHeader = req.header('Authorization')
 	    const token = authHeader && authHeader.split(' ')[1]
@@ -62,7 +62,7 @@ exports.checkTeacher =async (req, res,next ) => {
     }catch(err){
         res.json({success: false, message: 'Bạn chưa đăng nhập'})
     }
-}
+} */
 
 
 exports.checkAdmin =  (req, res, next) => {
@@ -85,7 +85,7 @@ exports.checkAdmin =  (req, res, next) => {
     }
 }
 
-exports.checkParent = async (req, res, next) => {
+/* exports.checkParent = async (req, res, next) => {
     try{
         const authHeader = req.header('Authorization')
 	    const token = authHeader && authHeader.split(' ')[1]
@@ -103,4 +103,4 @@ exports.checkParent = async (req, res, next) => {
     }catch(err){
         res.json({success: false, message: 'Bạn chưa đăng nhập'})
     }
-}
+} */
