@@ -607,6 +607,18 @@ const updateCurrentTuition = async (req, res) => {
     }
 }
 
+const updateCurrentTuitionFake = async (req, res) => {
+    try {
+        updateTuition(req.teacher, new Date(Date.UTC(2022, 1, 31)))
+    }catch(err) {
+        console.log(err)
+        return res.json({status:'fail', msg:err.message})
+    }
+    
+        return res.json({status:'ok', msg:'update tuitions ok'})
+    
+}
+
 // ------------------------------------------- hom thu ----------------------------------------
 // xem tat ca mail
 const getAllMail = async (req, res) => {
@@ -793,3 +805,4 @@ module.exports.getDetailMail = getDetailMail
 module.exports.updateTuitionPaid = updateTuitionPaid
 module.exports.getLogBook = getLogBook
 module.exports.updateCurrentTuition = updateCurrentTuition
+module.exports.updateCurrentTuitionFake = updateCurrentTuitionFake

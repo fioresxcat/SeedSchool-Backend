@@ -69,9 +69,12 @@ router.get('/api/teacher/tuition', checkTeacherRole, teacherController.getTuitio
 // router.post('/api/teacher/tuition', checkTeacherRole, teacherController.updateTuitionPaid)
 // cap nhat hoc phi thang hien tai
 router.get('/api/teacher/tuition/update', checkTeacherRole, teacherController.updateCurrentTuition)
-
+// cap nhat hoc phi thang hien tai demo
+router.get('/api/teacher/tuition/update/fake', checkTeacherRole, teacherController.updateCurrentTuitionFake)
 // gui thong bao hoc phi
 router.get('/api/teacher/tuition/sendnoti', checkTeacherRole, teacherController.sendTuitionNoti)
+
+
 
 // ----------------------------------------- hom thu -------------------------------
 // xem tat ca thu
