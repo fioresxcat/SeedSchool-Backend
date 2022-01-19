@@ -141,7 +141,7 @@ const getSchedule = async (req, res) => {
         try {
             const student = await Student.findOne({ parent: req.parent })
             const schedule = await Schedule.find({ student: student, date: new Date(date) })
-            if (schedule) {
+            if (schedule.length) {
                 return res.json({ status: 'ok', msg: 'get schedule with date ok', schedule: schedule })
             } else {
                 return res.json({ status: 'fail', msg: 'cannot find schedule', schedule: schedule })
@@ -248,7 +248,7 @@ const postMail = async (req, res) => {
         if (teacher) {
             let mail = new TeacherMail({
                 teacher: teacher,
-                date: getCurrentDateWithUTC(Date.now()),
+                date: getCurrentDateWithUTC(new Date()),
                 parent: req.parent,
                 title: title,
                 content: content
