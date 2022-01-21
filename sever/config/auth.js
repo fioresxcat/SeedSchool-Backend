@@ -11,7 +11,7 @@ exports.checkAuth = async (req, res, next) => {
 	try {
         const authHeader = req.header('Authorization')
 	    const token = authHeader && authHeader.split(' ')[1]
-		const idUser = jwt.verify(token,'mk')
+		const idUser = jwt.verify(token,'admin')
         await Admin.findOne({idUser})
         .then((data)=>{
             if(data){
@@ -29,7 +29,7 @@ exports.checkLogin = async (req, res, next) => {
 	try {
         const authHeader = req.header('Authorization')
 	    const token = authHeader && authHeader.split(' ')[1]
-		const idUser = jwt.verify(token,'mk')
+		const idUser = jwt.verify(token,'admin')
         await Admin.findOne({idUser})
         .then((data)=>{
             if(data){
@@ -44,7 +44,7 @@ exports.checkLogin = async (req, res, next) => {
 }
 
 
-exports.checkTeacher =async (req, res,next ) => {
+/* exports.checkTeacher =async (req, res,next ) => {
     try{
         const authHeader = req.header('Authorization')
 	    const token = authHeader && authHeader.split(' ')[1]
@@ -62,14 +62,14 @@ exports.checkTeacher =async (req, res,next ) => {
     }catch(err){
         res.json({success: false, message: 'Bạn chưa đăng nhập'})
     }
-}
+} */
 
 
 exports.checkAdmin =  (req, res, next) => {
     try{
         const authHeader = req.header('Authorization')
 	    const token = authHeader && authHeader.split(' ')[1]
-        const idUser = jwt.verify(token,'mk')
+        const idUser = jwt.verify(token,'admin')
         Admin.findOne({
             idUser
         })
@@ -85,7 +85,7 @@ exports.checkAdmin =  (req, res, next) => {
     }
 }
 
-exports.checkParent = async (req, res, next) => {
+/* exports.checkParent = async (req, res, next) => {
     try{
         const authHeader = req.header('Authorization')
 	    const token = authHeader && authHeader.split(' ')[1]
@@ -103,4 +103,4 @@ exports.checkParent = async (req, res, next) => {
     }catch(err){
         res.json({success: false, message: 'Bạn chưa đăng nhập'})
     }
-}
+} */
