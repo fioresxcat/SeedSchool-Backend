@@ -16,6 +16,10 @@ const studentSchema = new Schema({
         enum: ["Nam","Nữ"],   
         required: true
     },
+    avatar: {
+        type: String,
+        required: true
+    },
     teacher: {
         type: mongoose.SchemaTypes.ObjectId,
         required: true,

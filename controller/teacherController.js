@@ -86,7 +86,7 @@ const addStudent = async (req, res) => {
 
     const { sInfo, pInfo } = req.body
     // console.log(sInfo)
-    const { sName, sBirth, sSex } = sInfo
+    const { sName, sBirth, sSex, sAvatar } = sInfo
     // console.log(sName, sBirth, sSex)
     const { pUserName, pPassword, pName, pBirth, pSex, pPhoneNumber, pAddress } = pInfo
     // console.log(pUserName, pPassword, pName, pBirth, pSex, pPhoneNumber, pAddress)
@@ -113,6 +113,7 @@ const addStudent = async (req, res) => {
                 name: sName,
                 birth: new Date(sBirth),
                 sex: sSex,
+                avatar: sAvatar,
                 teacher: req.teacher,
                 parent: parent
             })
