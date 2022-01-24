@@ -558,7 +558,10 @@ const getTuitions = async (req, res) => {
 
     if (!time) { // nếu ko có thang gửi lên, hiển thị dữ liệu học phí của tháng gần nhất trong csdl
         try {
-            const tuitions = await Tuition.find({ teacher: req.teacher }).sort({ date: -1 }).limit(req.teacher.numStudent).populate('student')
+            // const tuitions = await Tuition.find({ teacher: req.teacher }).sort({ date: -1 }).limit(req.teacher.numStudent).populate('student')
+            let tuitions = await Tuition.find({ teacher: req.teacher }).sort({ date: -1 }).populate('student')
+            const latestDate = tuitions[0].date
+            tuitions = tuitions.filter(tuition => tuition.date.getTime() === latestDate.getTime())
             if (tuitions.length) {
                 return res.json({ status: 'ok', msg: 'get tuition for latest month ok', tuitions: tuitions })
             } else {
@@ -673,8 +676,8 @@ const sendTuitionNoti = async (req, res) => {
 Học phí cơ bản: ${tuition.baseTuition} triệu / tháng
 Số buổi nghỉ có phép: ${tuition.validAbsence}
 Số buổi nghỉ không phép: ${tuition.invalidAbsence}
-Số buổi trông muộn trước 5 rưỡi chiều: ${tuition.late1}
-Số buổi trông muộn sau 5 rưỡi chiều: ${tuition.late2}
+Số buổi trông muộn trước 6 rưỡi chiều: ${tuition.late1}
+Số buổi trông muộn sau 6 rưỡi chiều: ${tuition.late2}
 
 Tổng cộng học phí tháng: ${tuition.totalTuition}
 
